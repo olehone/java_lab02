@@ -2,7 +2,6 @@ package task3;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -20,13 +19,14 @@ import java.util.List;
 //        8. Розрахунок доходів за заданий період часу
 public class Passenger {
     public static int howLongSaveTickets = 60; //month
+
     private final static IdGenerator idGenerator = new IdGenerator();
     private final Long id;
     private String name;
     private String lastName;
     private boolean isBonusEnable;
-    private int flownKilometers;
-    private List<Ticket> tickets = new LinkedList<Ticket>();
+    private FlownKilometers flownKilometers;
+    private final List<Ticket> tickets = new LinkedList<Ticket>();
     public void addTicket(final Ticket ticket){
         tickets.add(ticket);
     }
@@ -39,20 +39,20 @@ public class Passenger {
         return tickets.removeIf(ticket ->
                 (ChronoUnit.MONTHS.between(currentTime, ticket.getDepartureTime())>howLongSaveTickets));
     }
-
     public Passenger(final String name, final String lastName, final boolean isBonusEnable, final int flownKilometers) {
         this.id = idGenerator.getId();
         this.name = name;
         this.lastName = lastName;
         this.isBonusEnable = isBonusEnable;
-        this.flownKilometers = flownKilometers;
+        this.flownKilometers = new FlownKilometers(flownKilometers);
     }
+
     public Passenger(final String name, final String lastName, final boolean isBonusEnable) {
         this.id = idGenerator.getId();
         this.name = name;
         this.lastName = lastName;
         this.isBonusEnable = isBonusEnable;
-        this.flownKilometers = 0;
+        this.flownKilometers = new FlownKilometers(0);
     }
     public Long getId(){
         return id;
@@ -60,7 +60,6 @@ public class Passenger {
     public String getName() {
         return name;
     }
-
     public void setName(final String name) {
         this.name = name;
     }
@@ -81,18 +80,18 @@ public class Passenger {
         this.isBonusEnable = isBonusEnable;
     }
 
-    public int getFlownKilometers() {
-        if(isBonusEnable)
-            return 0;
+    public FlownKilometers getFlownKilometers() {
         return flownKilometers;
+    }
+    public int getCountOfFlownKilometers() {
+        return flownKilometers.getValue();
     }
     public void addKilometers(final int flownKilometers){
         if(isBonusEnable)
-           this.flownKilometers += flownKilometers;
+           this.flownKilometers.addKilometers(flownKilometers);
     }
-
     public void setFlownKilometers(final int flownKilometers) {
-        this.flownKilometers = flownKilometers;
+        this.flownKilometers.setValue(flownKilometers);
     }
 
     @Override
@@ -101,6 +100,7 @@ public class Passenger {
                 "\n id: " + this.id +
                 "\n initials:  " + lastName +" " + name;
     }
+
     //in month
     public static void setHowLongSaveTickets(final int howLongSaveTickets) {
         Passenger.howLongSaveTickets = howLongSaveTickets;
