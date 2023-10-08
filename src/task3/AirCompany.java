@@ -6,11 +6,14 @@ public class AirCompany {
     private double baseEconomyCost;
     private double baseFirstCost;
     private double baseBusinessCost;
+    private double allowCancelPercentage;
     private double percentageMarkupForLastTicket;
+    private double percentageDiscountIfAllCancel;
     private double pricePerKm;
+    private double coefficientOfFlownKilometers;
     private double returnPercentageInLess3Day;
     private double returnPercentageInLess10Day;
-    private double returnPercentageInLess20Day;
+    private double returnPercentageInLess30Day;
     private double baseReturnPercentage;
     private double returnPercentageIfFlightCanceled;
     private double maxUnpaidWeightInKg;
@@ -19,17 +22,28 @@ public class AirCompany {
     private double priceForExtraLengthByCm;
     private double maxWeightInKg;
     private double maxSideLengthInCm;
-    public AirCompany(final String name, final double baseEconomyCost, final double baseFirstCost, final double baseBusinessCost, final double percentageMarkupForLastTicket, final double pricePerKm, final double returnPercentageInLess3Day, final double returnPercentageInLess10Day, final double returnPercentageInLess20Day, final double baseReturnPercentage) {
+
+    public AirCompany(final String name, final double baseEconomyCost, final double baseFirstCost, final double baseBusinessCost, final double allowCancelPercentage, final double percentageMarkupForLastTicket, final double percentageDiscountIfAllCancel, final double pricePerKm, final double coefficientOfFlownKilometers, final double returnPercentageInLess3Day, final double returnPercentageInLess10Day, final double returnPercentageInLess20Day, final double baseReturnPercentage, final double returnPercentageIfFlightCanceled, final double maxUnpaidWeightInKg, final double maxUnpaidSideLengthInCm, final double priceForExtraWeightByKg, final double priceForExtraLengthByCm, final double maxWeightInKg, final double maxSideLengthInCm) {
         this.name = name;
         this.baseEconomyCost = baseEconomyCost;
         this.baseFirstCost = baseFirstCost;
         this.baseBusinessCost = baseBusinessCost;
+        this.allowCancelPercentage = allowCancelPercentage;
         this.percentageMarkupForLastTicket = percentageMarkupForLastTicket;
+        this.percentageDiscountIfAllCancel = percentageDiscountIfAllCancel;
         this.pricePerKm = pricePerKm;
+        this.coefficientOfFlownKilometers = coefficientOfFlownKilometers;
         this.returnPercentageInLess3Day = returnPercentageInLess3Day;
         this.returnPercentageInLess10Day = returnPercentageInLess10Day;
-        this.returnPercentageInLess20Day = returnPercentageInLess20Day;
+        this.returnPercentageInLess30Day = returnPercentageInLess20Day;
         this.baseReturnPercentage = baseReturnPercentage;
+        this.returnPercentageIfFlightCanceled = returnPercentageIfFlightCanceled;
+        this.maxUnpaidWeightInKg = maxUnpaidWeightInKg;
+        this.maxUnpaidSideLengthInCm = maxUnpaidSideLengthInCm;
+        this.priceForExtraWeightByKg = priceForExtraWeightByKg;
+        this.priceForExtraLengthByCm = priceForExtraLengthByCm;
+        this.maxWeightInKg = maxWeightInKg;
+        this.maxSideLengthInCm = maxSideLengthInCm;
     }
 
     public String getName() {
@@ -64,6 +78,14 @@ public class AirCompany {
         this.baseBusinessCost = baseBusinessCost;
     }
 
+    public double getAllowCancelPercentage() {
+        return allowCancelPercentage;
+    }
+
+    public void setAllowCancelPercentage(final double allowCancelPercentage) {
+        this.allowCancelPercentage = allowCancelPercentage;
+    }
+
     public double getPercentageMarkupForLastTicket() {
         return percentageMarkupForLastTicket;
     }
@@ -72,12 +94,28 @@ public class AirCompany {
         this.percentageMarkupForLastTicket = percentageMarkupForLastTicket;
     }
 
+    public double getPercentageDiscountIfAllCancel() {
+        return percentageDiscountIfAllCancel;
+    }
+
+    public void setPercentageDiscountIfAllCancel(final double percentageDiscountIfAllCancel) {
+        this.percentageDiscountIfAllCancel = percentageDiscountIfAllCancel;
+    }
+
     public double getPricePerKm() {
         return pricePerKm;
     }
 
     public void setPricePerKm(final double pricePerKm) {
         this.pricePerKm = pricePerKm;
+    }
+
+    public double getCoefficientOfFlownKilometers() {
+        return coefficientOfFlownKilometers;
+    }
+
+    public void setCoefficientOfFlownKilometers(final double coefficientOfFlownKilometers) {
+        this.coefficientOfFlownKilometers = coefficientOfFlownKilometers;
     }
 
     public double getReturnPercentageInLess3Day() {
@@ -96,12 +134,12 @@ public class AirCompany {
         this.returnPercentageInLess10Day = returnPercentageInLess10Day;
     }
 
-    public double getReturnPercentageInLess20Day() {
-        return returnPercentageInLess20Day;
+    public double getReturnPercentageInLess30Day() {
+        return returnPercentageInLess30Day;
     }
 
-    public void setReturnPercentageInLess20Day(final double returnPercentageInLess20Day) {
-        this.returnPercentageInLess20Day = returnPercentageInLess20Day;
+    public void setReturnPercentageInLess30Day(final double returnPercentageInLess30Day) {
+        this.returnPercentageInLess30Day = returnPercentageInLess30Day;
     }
 
     public double getBaseReturnPercentage() {
