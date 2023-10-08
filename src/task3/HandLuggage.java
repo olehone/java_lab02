@@ -146,7 +146,6 @@ public class HandLuggage {
         final double maxSideLengthInCm = airCompany.getMaxSideLengthInCm();
         return isAllowed(weight, length, width, height, maxWeightInKg, maxSideLengthInCm);
     }
-
     public Long getId() {
         return id;
     }
