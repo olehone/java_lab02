@@ -25,20 +25,25 @@ public class Flight {
     private Aircraft aircraft;
     private boolean isCanceled;
     private List<Ticket> tickets;
+    private AirCompany airCompany;
 
 
     public ZonedDateTime getArrivalTime() {
         return arrivalTime;
     }
+
     public void setArrivalTime(final ZonedDateTime arrivalTime) {
         this.arrivalTime = arrivalTime;
     }
+
     public ZonedDateTime getDepartureTime() {
         return departureTime;
     }
+
     public void setDepartureTime(final ZonedDateTime departureTime) {
         this.departureTime = departureTime;
     }
+
     public Airport getArrivalAirport() {
         return arrivalAirport;
     }
@@ -62,9 +67,44 @@ public class Flight {
     public void setCanceled(final boolean canceled) {
         isCanceled = canceled;
     }
-    public double getNowTicketPrice(final AirCompany airCompany, final Ticket ticket )
-    {
-
+    public int getCountOfCanceled(){
+        int count = 0;
+        for(final Ticket ticket: tickets){
+            if(ticket.isCanceled())
+                count++;
+        }
+        return count;
     }
+    public int getCountOfSeats(){
+        return aircraft.getEconomySeat() + aircraft.getFirstSeat() + aircraft.getBusinessSeat();
+    }
+    public int getCountOfLeftTickets(){
+        int count = 0;
+        for(final Ticket ticket: tickets){
+            if(!ticket.isCanceled())
+                count++;
+        }
+        return getCountOfCanceled()-count;
+    }
+    public double getDistance(){
+        if(arrivalAirport==null||departureAirport==null)
+            return 0;
+        return Location.calculateDistanceByCoordinates(arrivalAirport.getLocation().getLatitude(),
+                arrivalAirport.getLocation().getLongitude(),
+                departureAirport.getLocation().getLatitude(),
+                departureAirport.getLocation().getLongitude());
+    }
+    public AirCompany getAirCompany() {
+        return airCompany;
+    }
+
+    public void setAirCompany(final AirCompany airCompany) {
+        this.airCompany = airCompany;
+    }
+
+    public double getNowTicketPrice(final AirCompany airCompany, final Ticket ticket) {
+        return 0;
+    }
+
 
 }
