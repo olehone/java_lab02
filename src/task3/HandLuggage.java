@@ -47,6 +47,9 @@ public class HandLuggage {
         this.heightInCm = height;
         this.additionalPrice = calculatePrice(weight, length, width, height, airCompany);
     }
+    public HandLuggage(final double weight, final int length, final int width, final int height, final Ticket ticket) {
+        this(weight, length, width, height, ticket, ticket.getFlight().getAirCompany());
+    }
 
     public boolean changeSize(final double weight, final int length, final int width, final int height, final boolean canPayMore, final AirCompany airCompany) {
         if (airCompany == null) {
@@ -164,6 +167,14 @@ public class HandLuggage {
 
     public int getHeightInCm() {
         return heightInCm;
+    }
+
+    public double getAdditionalPrice() {
+        return additionalPrice;
+    }
+
+    public void setAdditionalPrice(final double additionalPrice) {
+        this.additionalPrice = additionalPrice;
     }
 
     @Override
