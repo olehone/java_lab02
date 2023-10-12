@@ -2,50 +2,13 @@ package task3;
 
 public class AirCompany {
     private String name;
-    //rules
-    private double baseEconomyCost;
-    private double baseFirstCost;
-    private double baseBusinessCost;
-    private double allowCancelPercentage;
-    private double percentageMarkupForLastTicket;
-    private double percentageDiscountIfAllCancel;
-    private double pricePerKm;
-    private double coefficientOfFlownKilometers;
-    private double returnPercentageInLess3Day;
-    private double returnPercentageInLess10Day;
-    private double returnPercentageInLess30Day;
-    private double baseReturnPercentage;
-    private double returnPercentageIfFlightCanceled;
-    private double maxUnpaidWeightInKg;
-    private double maxUnpaidSideLengthInCm;
-    private double priceForExtraWeightByKg;
-    private double priceForExtraLengthByCm;
-    private double maxWeightInKg;
-    private double maxSideLengthInCm;
-
-    public AirCompany(final String name, final double baseEconomyCost, final double baseFirstCost, final double baseBusinessCost, final double allowCancelPercentage, final double percentageMarkupForLastTicket, final double percentageDiscountIfAllCancel, final double pricePerKm, final double coefficientOfFlownKilometers, final double returnPercentageInLess3Day, final double returnPercentageInLess10Day, final double returnPercentageInLess20Day, final double baseReturnPercentage, final double returnPercentageIfFlightCanceled, final double maxUnpaidWeightInKg, final double maxUnpaidSideLengthInCm, final double priceForExtraWeightByKg, final double priceForExtraLengthByCm, final double maxWeightInKg, final double maxSideLengthInCm) {
+    private FlightPrices flightPrices;
+    private LuggageRules luggageRules;
+    public AirCompany(final String name, final FlightPrices flightPrices, final LuggageRules luggageRules) {
         this.name = name;
-        this.baseEconomyCost = baseEconomyCost;
-        this.baseFirstCost = baseFirstCost;
-        this.baseBusinessCost = baseBusinessCost;
-        this.allowCancelPercentage = allowCancelPercentage;
-        this.percentageMarkupForLastTicket = percentageMarkupForLastTicket;
-        this.percentageDiscountIfAllCancel = percentageDiscountIfAllCancel;
-        this.pricePerKm = pricePerKm;
-        this.coefficientOfFlownKilometers = coefficientOfFlownKilometers;
-        this.returnPercentageInLess3Day = returnPercentageInLess3Day;
-        this.returnPercentageInLess10Day = returnPercentageInLess10Day;
-        this.returnPercentageInLess30Day = returnPercentageInLess20Day;
-        this.baseReturnPercentage = baseReturnPercentage;
-        this.returnPercentageIfFlightCanceled = returnPercentageIfFlightCanceled;
-        this.maxUnpaidWeightInKg = maxUnpaidWeightInKg;
-        this.maxUnpaidSideLengthInCm = maxUnpaidSideLengthInCm;
-        this.priceForExtraWeightByKg = priceForExtraWeightByKg;
-        this.priceForExtraLengthByCm = priceForExtraLengthByCm;
-        this.maxWeightInKg = maxWeightInKg;
-        this.maxSideLengthInCm = maxSideLengthInCm;
+        this.flightPrices = flightPrices;
+        this.luggageRules = luggageRules;
     }
-
     public String getName() {
         return name;
     }
@@ -54,155 +17,20 @@ public class AirCompany {
         this.name = name;
     }
 
-    public double getBaseEconomyCost() {
-        return baseEconomyCost;
+    public FlightPrices getFlightPrices() {
+        return flightPrices;
     }
 
-    public void setBaseEconomyCost(final double baseEconomyCost) {
-        this.baseEconomyCost = baseEconomyCost;
+    public void setFlightPrices(final FlightPrices flightPrices) {
+        this.flightPrices = flightPrices;
     }
 
-    public double getBaseFirstCost() {
-        return baseFirstCost;
+    public LuggageRules getLuggageRules() {
+        return luggageRules;
     }
 
-    public void setBaseFirstCost(final double baseFirstCost) {
-        this.baseFirstCost = baseFirstCost;
-    }
-
-    public double getBaseBusinessCost() {
-        return baseBusinessCost;
-    }
-
-    public void setBaseBusinessCost(final double baseBusinessCost) {
-        this.baseBusinessCost = baseBusinessCost;
-    }
-
-    public double getAllowCancelPercentage() {
-        return allowCancelPercentage;
-    }
-
-    public void setAllowCancelPercentage(final double allowCancelPercentage) {
-        this.allowCancelPercentage = allowCancelPercentage;
-    }
-
-    public double getPercentageMarkupForLastTicket() {
-        return percentageMarkupForLastTicket;
-    }
-
-    public void setPercentageMarkupForLastTicket(final double percentageMarkupForLastTicket) {
-        this.percentageMarkupForLastTicket = percentageMarkupForLastTicket;
-    }
-
-    public double getPercentageDiscountIfAllCancel() {
-        return percentageDiscountIfAllCancel;
-    }
-
-    public void setPercentageDiscountIfAllCancel(final double percentageDiscountIfAllCancel) {
-        this.percentageDiscountIfAllCancel = percentageDiscountIfAllCancel;
-    }
-
-    public double getPricePerKm() {
-        return pricePerKm;
-    }
-
-    public void setPricePerKm(final double pricePerKm) {
-        this.pricePerKm = pricePerKm;
-    }
-
-    public double getCoefficientOfFlownKilometers() {
-        return coefficientOfFlownKilometers;
-    }
-
-    public void setCoefficientOfFlownKilometers(final double coefficientOfFlownKilometers) {
-        this.coefficientOfFlownKilometers = coefficientOfFlownKilometers;
-    }
-
-    public double getReturnPercentageInLess3Day() {
-        return returnPercentageInLess3Day;
-    }
-
-    public void setReturnPercentageInLess3Day(final double returnPercentageInLess3Day) {
-        this.returnPercentageInLess3Day = returnPercentageInLess3Day;
-    }
-
-    public double getReturnPercentageInLess10Day() {
-        return returnPercentageInLess10Day;
-    }
-
-    public void setReturnPercentageInLess10Day(final double returnPercentageInLess10Day) {
-        this.returnPercentageInLess10Day = returnPercentageInLess10Day;
-    }
-
-    public double getReturnPercentageInLess30Day() {
-        return returnPercentageInLess30Day;
-    }
-
-    public void setReturnPercentageInLess30Day(final double returnPercentageInLess30Day) {
-        this.returnPercentageInLess30Day = returnPercentageInLess30Day;
-    }
-
-    public double getBaseReturnPercentage() {
-        return baseReturnPercentage;
-    }
-
-    public void setBaseReturnPercentage(final double baseReturnPercentage) {
-        this.baseReturnPercentage = baseReturnPercentage;
-    }
-
-    public double getReturnPercentageIfFlightCanceled() {
-        return returnPercentageIfFlightCanceled;
-    }
-
-    public void setReturnPercentageIfFlightCanceled(final double returnPercentageIfFlightCanceled) {
-        this.returnPercentageIfFlightCanceled = returnPercentageIfFlightCanceled;
-    }
-
-    public double getMaxUnpaidWeightInKg() {
-        return maxUnpaidWeightInKg;
-    }
-
-    public void setMaxUnpaidWeightInKg(final double maxUnpaidWeightInKg) {
-        this.maxUnpaidWeightInKg = maxUnpaidWeightInKg;
-    }
-
-    public double getMaxUnpaidSideLengthInCm() {
-        return maxUnpaidSideLengthInCm;
-    }
-
-    public void setMaxUnpaidSideLengthInCm(final double maxUnpaidSideLengthInCm) {
-        this.maxUnpaidSideLengthInCm = maxUnpaidSideLengthInCm;
-    }
-
-    public double getPriceForExtraWeightByKg() {
-        return priceForExtraWeightByKg;
-    }
-
-    public void setPriceForExtraWeightByKg(final double priceForExtraWeightByKg) {
-        this.priceForExtraWeightByKg = priceForExtraWeightByKg;
-    }
-
-    public double getPriceForExtraLengthByCm() {
-        return priceForExtraLengthByCm;
-    }
-
-    public void setPriceForExtraLengthByCm(final double priceForExtraLengthByCm) {
-        this.priceForExtraLengthByCm = priceForExtraLengthByCm;
-    }
-
-    public double getMaxWeightInKg() {
-        return maxWeightInKg;
-    }
-
-    public void setMaxWeightInKg(final double maxWeightInKg) {
-        this.maxWeightInKg = maxWeightInKg;
-    }
-
-    public double getMaxSideLengthInCm() {
-        return maxSideLengthInCm;
-    }
-
-    public void setMaxSideLengthInCm(final double maxSideLengthInCm) {
-        this.maxSideLengthInCm = maxSideLengthInCm;
+    public void setLuggageRules(final LuggageRules luggageRules) {
+        this.luggageRules = luggageRules;
     }
 }
+
