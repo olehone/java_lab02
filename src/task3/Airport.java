@@ -15,7 +15,6 @@ package task3;
 public class Airport {
     private Location location;
     private FlightSchedule flightSchedule;
-    private AirportOwner airportOwner;
 
     public void addFlight(final Flight flight) {
         flightSchedule.addFlight(flight);
@@ -23,7 +22,11 @@ public class Airport {
 
     public Airport(final Location location) {
         this.location = location;
-        this.flightSchedule = new FlightSchedule(this);
+        this.flightSchedule = new FlightSchedule();
+    }
+    public Airport(final Location location, final ScheduleRules scheduleRules) {
+        this.location = location;
+        this.flightSchedule = new FlightSchedule(scheduleRules);
     }
 
     public FlightSchedule getFlightSchedule() {
@@ -45,13 +48,4 @@ public class Airport {
             this.location = location;
         }
     }
-
-    public AirportOwner getAirportOwner() {
-        return airportOwner;
-    }
-
-    public void setAirportOwner(final AirportOwner airportOwner) {
-        this.airportOwner = airportOwner;
-    }
-
 }
