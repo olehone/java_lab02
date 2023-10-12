@@ -64,36 +64,118 @@ public class Flight {
         return isCanceled;
     }
 
-    public void setCanceled(final boolean canceled) {
-        isCanceled = canceled;
+    public Aircraft getAircraft() {
+        return aircraft;
     }
-    public int getCountOfCanceled(){
+
+    public void setAircraft(final Aircraft aircraft) {
+        this.aircraft = aircraft;
+    }
+
+    public List<Ticket> getTickets() {
+        return tickets;
+    }
+    public void addTicket(final Ticket ticket) {
+        tickets.add(ticket);
+    }
+
+    public boolean addPassenger(final TicketClass ticketClass, final Passenger passenger) {
+        if (getCountOfLeftTicketsByClass(ticketClass)<=0)
+            return false;
+        final Ticket newTicket = new Ticket(passenger,ticketClass,this);
+        passenger.addTicket(newTicket);
+        this.addTicket(newTicket);
+        return true;
+    }
+
+    public String getSeatsCountToString() {
+        final int leftEcoTickets = getCountOfLeftTicketsByClass(TicketClass.Economy);
+        final int leftFirstTickets = getCountOfLeftTicketsByClass(TicketClass.First);
+        final int leftBusinessTickets = getCountOfLeftTicketsByClass(TicketClass.Business);
+        final int ecoSeats = aircraft.getEconomySeat();
+        final int firstSeats = aircraft.getFirstSeat();
+        final int businessSeats = aircraft.getBusinessSeat();
+        return "Flight " + id +
+                "\n Class | Free | Occupied | Total | Base price |" +
+                "\n   Eco |   " + leftEcoTickets + " |       " + (ecoSeats - leftEcoTickets) + " |    " + ecoSeats + " | " + Ticket.calculatePrice(TicketClass.Economy, this, airCompany.getFlightPrices()) + " |" +
+                "\n First |   " + leftFirstTickets + " |       " + (firstSeats - leftFirstTickets) + " |    " + firstSeats + " |" + Ticket.calculatePrice(TicketClass.First, this, airCompany.getFlightPrices()) + " |" +
+                "\n  Buss |   " + leftBusinessTickets + " |       " + (businessSeats - leftBusinessTickets) + " |    " + businessSeats + " |" + Ticket.calculatePrice(TicketClass.Business, this, airCompany.getFlightPrices()) + " |\n" +
+                "\n Total |   " + getCountOfLeftTickets() + " |       " + (ecoSeats - leftEcoTickets + firstSeats - leftFirstTickets + businessSeats - leftBusinessTickets) + " |    " + (ecoSeats + firstSeats + businessSeats) + " |\n";
+    }
+
+    public void cancel() {
+        for (final Ticket ticket : tickets) {
+            if (ticket != null)
+                ticket.flightCancel();
+        }
+        isCanceled = true;
+    }
+
+    public int getCountOfCanceled() {
         int count = 0;
-        for(final Ticket ticket: tickets){
-            if(ticket.isCanceled())
+        for (final Ticket ticket : tickets) {
+            if (ticket.isCanceled())
                 count++;
         }
         return count;
     }
-    public int getCountOfSeats(){
+
+    public int getCountOfSeats() {
         return aircraft.getEconomySeat() + aircraft.getFirstSeat() + aircraft.getBusinessSeat();
     }
-    public int getCountOfLeftTickets(){
+
+    public int getCountOfSeatsByClass(final TicketClass ticketClass) {
+        switch (ticketClass) {
+            case Economy -> {
+                return aircraft.getEconomySeat();
+            }
+            case First -> {
+                return aircraft.getFirstSeat();
+            }
+            case Business ->{
+                return aircraft.getBusinessSeat();}
+            default -> {
+                return 0;
+            }
+        }
+    }
+    public int getCountOfLeftTickets() {
         int count = 0;
-        for(final Ticket ticket: tickets){
-            if(!ticket.isCanceled())
+        for (final Ticket ticket : tickets) {
+            if (!ticket.isCanceled())
                 count++;
         }
-        return getCountOfCanceled()-count;
+        return this.getCountOfSeats() - count;
     }
-    public double getDistance(){
-        if(arrivalAirport==null||departureAirport==null)
+
+    public int getCountOfLeftTicketsByClass(final TicketClass ticketClass) {
+        int count = 0;
+        for (final Ticket ticket : tickets) {
+            if (ticket.isCanceled())
+                continue;
+            if (ticket.getTicketClass() == ticketClass)
+                count++;
+        }
+        return this.getCountOfSeatsByClass(ticketClass) - count;
+    }
+    public int getCountOfOccupiedTickets() {
+        int count = 0;
+        for (final Ticket ticket : tickets) {
+            if (!ticket.isCanceled())
+                count++;
+        }
+        return getCountOfCanceled() - count;
+    }
+
+    public double getDistance() {
+        if (arrivalAirport == null || departureAirport == null)
             return 0;
         return Location.calculateDistanceByCoordinates(arrivalAirport.getLocation().getLatitude(),
                 arrivalAirport.getLocation().getLongitude(),
                 departureAirport.getLocation().getLatitude(),
                 departureAirport.getLocation().getLongitude());
     }
+
     public AirCompany getAirCompany() {
         return airCompany;
     }
@@ -105,6 +187,4 @@ public class Flight {
     public double getNowTicketPrice(final AirCompany airCompany, final Ticket ticket) {
         return 0;
     }
-
-
 }
