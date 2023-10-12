@@ -25,26 +25,26 @@ public class Passenger {
     private String name;
     private String lastName;
     private boolean isBonusEnable;
-    private FlownKilometers flownKilometers;
+    private final FlownKilometers flownKilometers;
     private final List<Ticket> tickets = new LinkedList<Ticket>();
-    public void addTicket(final Ticket ticket){
-        tickets.add(ticket);
-    }
-    public List<Ticket> getTickets()
-    {
-        return this.tickets;
-    }
-    public boolean removeOldTickets(){
-        final ZonedDateTime currentTime = ZonedDateTime.now();
-        return tickets.removeIf(ticket ->
-                (ChronoUnit.MONTHS.between(currentTime, ticket.getDepartureTime())>howLongSaveTickets));
-    }
     public Passenger(final String name, final String lastName, final boolean isBonusEnable, final int flownKilometers) {
         this.id = idGenerator.getId();
         this.name = name;
         this.lastName = lastName;
         this.isBonusEnable = isBonusEnable;
         this.flownKilometers = new FlownKilometers(flownKilometers);
+    }
+    public boolean removeOldTickets(){
+        final ZonedDateTime currentTime = ZonedDateTime.now();
+        return tickets.removeIf(ticket ->
+                (ChronoUnit.MONTHS.between(currentTime, ticket.getDepartureTime())>howLongSaveTickets));
+    }
+    public void addTicket(final Ticket ticket){
+        tickets.add(ticket);
+    }
+    public List<Ticket> getTickets()
+    {
+        return this.tickets;
     }
 
     public Passenger(final String name, final String lastName, final boolean isBonusEnable) {
@@ -94,15 +94,18 @@ public class Passenger {
         this.flownKilometers.setValue(flownKilometers);
     }
 
+    //in month
+    public static void setHowLongSaveTickets(final int howLongSaveTickets) {
+        Passenger.howLongSaveTickets = howLongSaveTickets;
+    }
+    public void notifyIfCancelFlight(final Ticket ticket)
+    {
+        System.out.println("Sorry, we cancel flight on ticket" + ticket.toString());
+    }
     @Override
     public String toString() {
         return "Passenger" +
                 "\n id: " + this.id +
                 "\n initials:  " + lastName +" " + name;
-    }
-
-    //in month
-    public static void setHowLongSaveTickets(final int howLongSaveTickets) {
-        Passenger.howLongSaveTickets = howLongSaveTickets;
     }
 }

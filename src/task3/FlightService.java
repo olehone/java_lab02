@@ -17,10 +17,6 @@ public class FlightService {
     public static void configuration(){
         //how many months to keep tickets per passenger
         Passenger.setHowLongSaveTickets(60);
-        //how many days to keep flights in schedule
-        FlightSchedule.setHowLongSaveFlights(10);
-        //how many hours show flight in schedule
-        FlightSchedule.setHowManyHoursShowFlight(5);
     }
     public static void main(){
         final Passenger passenger1 = new Passenger("Петро", "Вакарчук", true);

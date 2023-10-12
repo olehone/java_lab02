@@ -4,7 +4,6 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 //Створіть систему управління польотами авіакомпанії. Пропоновані
 //        класи для ієрархії: літак, аеропорт, пасажир, рейс, розклад польотів,
@@ -19,61 +18,46 @@ import java.util.stream.Collectors;
 //        7. Продаж, скасування квитків
 //        8. Розрахунок доходів за заданий період часу
 public class FlightSchedule {
-    private static int howManyHoursShowFlight;
-    private static int howLongSaveFlights; //days
-    private Airport ownAirport;
+    private ScheduleRules scheduleRules;
     private final List<Flight> flights;
-
-    public FlightSchedule(final Airport ownAirport) {
-        this.ownAirport = ownAirport;
+    public FlightSchedule() {
+        this.scheduleRules = new ScheduleRules();
         this.flights = new LinkedList<>();
     }
-
-    public static void setHowLongSaveFlights(final int howLongSaveFlights) {
-        FlightSchedule.howLongSaveFlights = howLongSaveFlights;
+    public FlightSchedule(final ScheduleRules scheduleRules) {
+        this.scheduleRules = scheduleRules;
+        this.flights = new LinkedList<>();
     }
-
     public boolean removeOldFlights() {
         final ZonedDateTime currentTime = ZonedDateTime.now();
+        final int howLongSaveFlights = scheduleRules.getHowManyDaysSaveFlights();
         return flights.removeIf(flight ->
                 (ChronoUnit.DAYS.between(currentTime, flight.getDepartureTime()) > howLongSaveFlights));
     }
-
     public List<Flight> getFreshFlights() {
         final ZonedDateTime currentTime = ZonedDateTime.now();
         return flights.stream()
-                .filter(flight -> flight.getDepartureTime().isAfter(currentTime.minusHours(howManyHoursShowFlight)))
+                .filter(flight -> flight.getDepartureTime().isAfter(currentTime.minusHours(scheduleRules.getHowManyHoursShowFlight())))
                 .toList();
     }
-    public List<Flight> getFreshDeparturesFlights(){
-       return getFreshFlights().stream().filter(flight -> flight.getDepartureAirport()==ownAirport).toList();
+    public List<Flight> getFreshDeparturesFlights(){return getFreshFlights().stream().filter(flight -> flight.getDepartureAirport().getFlightSchedule() ==this).toList();
     }
     public List<Flight> getFreshArrivalFlights(){
-        return getFreshFlights().stream().filter(flight -> flight.getArrivalAirport()==ownAirport).toList();
+        return getFreshFlights().stream().filter(flight -> flight.getArrivalAirport().getFlightSchedule() ==this).toList();
     }
-
     public List<Flight> getFlights() {
         return flights;
     }
-
     public void addFlight(final Flight flight) {
         this.flights.add(flight);
     }
     public void removeFlight(final Flight flight) {
         this.flights.remove(flight);
     }
-    public Airport getOwnAirport() {
-        return ownAirport;
+    public ScheduleRules getScheduleRules() {
+        return scheduleRules;
     }
-    public void setOwnAirport(final Airport ownAirport) {
-        this.ownAirport = ownAirport;
-    }
-
-    public static void setHowManyHoursShowFlight(final int howManyHoursShowFlight) {
-        FlightSchedule.howManyHoursShowFlight = howManyHoursShowFlight;
+    public void setScheduleRules(final ScheduleRules scheduleRules) {
+        this.scheduleRules = scheduleRules;
     }
 }
-
-
-//    private String departureCity;
-//    private String arrivalCity;

@@ -14,9 +14,7 @@ package task3;
 //8. Розрахунок доходів за заданий період часу
 public class Aircraft {
     private static IdGenerator idGenerator;
-
     private final Long id;
-
     private String manufacturer;
     private String model;
     private int economySeat;

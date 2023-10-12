@@ -1,6 +1,6 @@
 import task3.FlownKilometers;
 import task3.Ticket;
-import task3.TypeOfTicket;
+import task3.TicketClass;
 
 public class Main {
     public static void main(final String[] args) {
@@ -43,7 +43,7 @@ public class Main {
 
         task3.FlightService.main();
         final FlownKilometers test = new FlownKilometers(12000);
-        final TypeOfTicket type = TypeOfTicket.economyClass;
+        final TicketClass type = TicketClass.Economy;
         System.out.println(test);
         System.out.println(test.getValue());
         final double price = Ticket.calculatePrice(type, 1000, 1300, 1500,

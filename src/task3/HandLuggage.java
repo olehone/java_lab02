@@ -34,10 +34,10 @@ public class HandLuggage {
         this.additionalPrice = calculatePrice(weight, length, width, height, maxUnpaidWeightInKg, maxUnpaidSideLengthInCm, priceForExtraWeightByKg, priceForExtraLengthByCm);
     }
 
-    public HandLuggage(final double weight, final int length, final int width, final int height, final Ticket ticket, final AirCompany airCompany) {
+    public HandLuggage(final double weight, final int length, final int width, final int height, final Ticket ticket, final LuggageRules luggageRules) {
         this.ticket = ticket;
         this.id = idGenerator.getId();
-        if (!isAllowed(weight, length, width, height, airCompany)) {
+        if (!isAllowed(weight, length, width, height, luggageRules)) {
             this.additionalPrice = 0;
             return;
         }
@@ -45,22 +45,29 @@ public class HandLuggage {
         this.lengthInCm = length;
         this.widthInCm = width;
         this.heightInCm = height;
-        this.additionalPrice = calculatePrice(weight, length, width, height, airCompany);
+        this.additionalPrice = calculatePrice(weight, length, width, height, luggageRules);
     }
     public HandLuggage(final double weight, final int length, final int width, final int height, final Ticket ticket) {
-        this(weight, length, width, height, ticket, ticket.getFlight().getAirCompany());
+        this(weight, length, width, height, ticket, ticket.getFlight().getAirCompany().getLuggageRules());
     }
 
     public boolean changeSize(final double weight, final int length, final int width, final int height, final boolean canPayMore, final AirCompany airCompany) {
         if (airCompany == null) {
             throw new NullPointerException("Can`t change price! Air company is null");
         }
-        final double maxUnpaidSideLengthInCm = airCompany.getMaxUnpaidSideLengthInCm();
-        final double maxUnpaidWeightInKg = airCompany.getMaxUnpaidWeightInKg();
-        final double priceForExtraLengthByCm = airCompany.getPriceForExtraLengthByCm();
-        final double priceForExtraWeightByKg = airCompany.getPriceForExtraWeightByKg();
+        return changeSize(weight, length, width, height, canPayMore, airCompany.getLuggageRules());
+    }
+    public boolean changeSize(final double weight, final int length, final int width, final int height, final boolean canPayMore, final LuggageRules luggageRules) {
+        if (luggageRules == null) {
+            throw new NullPointerException("Can`t change price! Luggage rules is null");
+        }
+        final double maxUnpaidSideLengthInCm = luggageRules.getMaxUnpaidSideLengthInCm();
+        final double maxUnpaidWeightInKg = luggageRules.getMaxUnpaidWeightInKg();
+        final double priceForExtraLengthByCm = luggageRules.getPriceForExtraLengthByCm();
+        final double priceForExtraWeightByKg = luggageRules.getPriceForExtraWeightByKg();
         return changeSize(weight, length, width, height, canPayMore, maxUnpaidWeightInKg, maxUnpaidSideLengthInCm, priceForExtraWeightByKg, priceForExtraLengthByCm);
     }
+
 
     public boolean changeSize(final double weight, final int length, final int width, final int height, final boolean canPayMore, final double maxUnpaidWeightInKg, final double maxUnpaidSideLengthInCm, final double priceForExtraWeightByKg, final double priceForExtraLengthByCm) {
         if (!isAllowed(weight, length, width, height, maxUnpaidWeightInKg, maxUnpaidSideLengthInCm)) {
@@ -87,10 +94,18 @@ public class HandLuggage {
         if (airCompany == null) {
             throw new NullPointerException("Can`t calculate price! Air company is null");
         }
-        final double maxUnpaidWeightInKg = airCompany.getMaxUnpaidWeightInKg();
-        final double maxUnpaidSideLengthInCm = airCompany.getMaxUnpaidSideLengthInCm();
-        final double priceForExtraWeightByKg = airCompany.getPriceForExtraWeightByKg();
-        final double priceForExtraLengthByCm = airCompany.getPriceForExtraLengthByCm();
+
+        return calculatePrice(weight, length, width, height, airCompany.getLuggageRules());
+    }
+    public Double calculatePrice(final double weight, final int length, final int width, final int height, final LuggageRules luggageRules) {
+
+        if (luggageRules == null) {
+            throw new NullPointerException("Can`t calculate price! Luggage rules is null");
+        }
+        final double maxUnpaidWeightInKg = luggageRules.getMaxUnpaidWeightInKg();
+        final double maxUnpaidSideLengthInCm = luggageRules.getMaxUnpaidSideLengthInCm();
+        final double priceForExtraWeightByKg = luggageRules.getPriceForExtraWeightByKg();
+        final double priceForExtraLengthByCm = luggageRules.getPriceForExtraLengthByCm();
         return calculatePrice(weight, length, width, height, maxUnpaidWeightInKg, maxUnpaidSideLengthInCm, priceForExtraWeightByKg, priceForExtraLengthByCm);
     }
 
@@ -127,8 +142,14 @@ public class HandLuggage {
         if (airCompany == null) {
             throw new NullPointerException("Can`t calculate price! Air company is null");
         }
-        final double maxUnpaidWeightInKg = airCompany.getMaxUnpaidWeightInKg();
-        final double maxUnpaidSideLengthInCm = airCompany.getMaxUnpaidSideLengthInCm();
+        return isUnpaid(weight, length, width, height, airCompany.getLuggageRules());
+    }
+    public boolean isUnpaid(final double weight, final int length, final int width, final int height, final LuggageRules luggageRules) {
+        if (luggageRules == null) {
+            throw new NullPointerException("Can`t calculate price! Luggage rules is null");
+        }
+        final double maxUnpaidWeightInKg = luggageRules.getMaxUnpaidWeightInKg();
+        final double maxUnpaidSideLengthInCm = luggageRules.getMaxUnpaidSideLengthInCm();
         return isUnpaid(weight, length, width, height, maxUnpaidWeightInKg, maxUnpaidSideLengthInCm);
     }
 
@@ -142,11 +163,16 @@ public class HandLuggage {
     }
 
     public boolean isAllowed(final double weight, final int length, final int width, final int height, final AirCompany airCompany) {
-        if (airCompany == null) {
+        if(airCompany == null)
             throw new NullPointerException("Can`t calculate price! Air company is null");
+        return isAllowed(weight, length, width, height, airCompany.getLuggageRules());
+    }
+    public boolean isAllowed(final double weight, final int length, final int width, final int height, final LuggageRules luggageRules) {
+        if (luggageRules == null) {
+            throw new NullPointerException("Can`t calculate price! Luggage rules is null");
         }
-        final double maxWeightInKg = airCompany.getMaxWeightInKg();
-        final double maxSideLengthInCm = airCompany.getMaxSideLengthInCm();
+        final double maxWeightInKg = luggageRules.getMaxWeightInKg();
+        final double maxSideLengthInCm = luggageRules.getMaxSideLengthInCm();
         return isAllowed(weight, length, width, height, maxWeightInKg, maxSideLengthInCm);
     }
     public Long getId() {
