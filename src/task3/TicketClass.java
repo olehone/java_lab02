@@ -12,8 +12,8 @@ package task3;
 //        6. Створення розкладу польотів
 //        7. Продаж, скасування квитків
 //        8. Розрахунок доходів за заданий період часу
-public enum TypeOfTicket {
-    economyClass,
-    firstClass,
-    businessClass,
+public enum TicketClass {
+    Economy,
+    First,
+    Business,
 }
