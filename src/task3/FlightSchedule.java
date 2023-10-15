@@ -60,4 +60,15 @@ public class FlightSchedule {
     public void setScheduleRules(final ScheduleRules scheduleRules) {
         this.scheduleRules = scheduleRules;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder str = new StringBuilder();
+        str.append("Departures: \n");
+        for(final Flight flight: getFreshDeparturesFlights())
+        {
+            str.append(flight.toString());
+        }
+        return str.toString();
+    }
 }

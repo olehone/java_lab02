@@ -13,7 +13,7 @@ package task3;
 //7. Продаж, скасування квитків
 //8. Розрахунок доходів за заданий період часу
 public class Aircraft {
-    private static IdGenerator idGenerator;
+    private static final IdGenerator idGenerator = new IdGenerator();
     private final Long id;
     private String manufacturer;
     private String model;
@@ -73,4 +73,10 @@ public class Aircraft {
         this.businessSeat = businessSeat;
     }
 
+    @Override
+    public String toString() {
+        return "Aircraft" +
+                " id: " + id +
+                ", " + manufacturer +" " + model;
+    }
 }

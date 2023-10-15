@@ -13,39 +13,40 @@ package task3;
 //        7. Продаж, скасування квитків
 //        8. Розрахунок доходів за заданий період часу
 public class Airport {
+    private final static  IdGenerator idGenerator = new IdGenerator();
+    private final Long id;
     private Location location;
-    private FlightSchedule flightSchedule;
+    private final FlightSchedule flightSchedule;
 
+    public Airport(final Location location) {
+        this.id = idGenerator.getId();
+        this.location = location;
+        this.flightSchedule = new FlightSchedule();
+    }
     public void addFlight(final Flight flight) {
         flightSchedule.addFlight(flight);
     }
 
-    public Airport(final Location location) {
-        this.location = location;
-        this.flightSchedule = new FlightSchedule();
-    }
-    public Airport(final Location location, final ScheduleRules scheduleRules) {
-        this.location = location;
-        this.flightSchedule = new FlightSchedule(scheduleRules);
+    public Long getId() {
+        return id;
     }
 
     public FlightSchedule getFlightSchedule() {
         return flightSchedule;
     }
-
-    public void setFlightSchedule(final FlightSchedule flightSchedule) {
-        if (flightSchedule != null) {
-            this.flightSchedule = flightSchedule;
-        }
-    }
-
     public Location getLocation() {
         return location;
     }
-
     public void setLocation(final Location location) {
         if (location != null) {
             this.location = location;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Airport" +
+                " id: " + id +
+                "\n location: " + location.toString();
     }
 }

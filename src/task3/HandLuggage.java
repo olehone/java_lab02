@@ -50,7 +50,15 @@ public class HandLuggage {
     public HandLuggage(final double weight, final int length, final int width, final int height, final Ticket ticket) {
         this(weight, length, width, height, ticket, ticket.getFlight().getAirCompany().getLuggageRules());
     }
-
+    public double cancel() {
+        final double returnAdditionalPrice = additionalPrice;
+        this.weight = 0;
+        this.heightInCm = 0;
+        this.lengthInCm = 0;
+        this.widthInCm = 0;
+        this.additionalPrice = 0;
+        return returnAdditionalPrice;
+    }
     public boolean changeSize(final double weight, final int length, final int width, final int height, final boolean canPayMore, final AirCompany airCompany) {
         if (airCompany == null) {
             throw new NullPointerException("Can`t change price! Air company is null");

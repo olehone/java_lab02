@@ -7,6 +7,31 @@ import java.time.ZonedDateTime;
 //TODO: add weather
 public class Location {
     private final String country;
+    private final String city;
+    private String address;
+    private final double latitude;
+    private final double longitude;
+    private ZoneId zoneId;
+    public Location(final String address, final String country, final String city, final double latitude, final double longitude, final ZoneId zoneId) {
+        this.address = address;
+        this.country = country;
+        this.city = city;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.zoneId = zoneId;
+    }
+    public Location(final String address, final String country, final String city, final double latitude, final double longitude, final String utsOffset) {
+        this.address = address;
+        this.country = country;
+        this.city = city;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.zoneId = ZoneOffset.of(utsOffset);
+    }
+
+    public void setAddress(final String address) {
+        this.address = address;
+    }
 
     public String getCountry() {
         return country;
@@ -18,30 +43,6 @@ public class Location {
 
     public String getAddress() {
         return address;
-    }
-
-    private final String city;
-    private String address;
-
-    private final double latitude;
-
-    private final double longitude;
-
-    private ZoneId zoneId;
-
-    public Location(final String country, final String city, final double latitude, final double longitude, final ZoneId zoneId) {
-        this.country = country;
-        this.city = city;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.zoneId = zoneId;
-    }
-    public Location(final String country, final String city, final double latitude, final double longitude, final String utsOffset) {
-        this.country = country;
-        this.city = city;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.zoneId = ZoneOffset.of(utsOffset);
     }
     public void setZoneId(final ZoneId zoneId) {
         this.zoneId = zoneId;

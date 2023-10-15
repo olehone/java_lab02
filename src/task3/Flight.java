@@ -1,6 +1,7 @@
 package task3;
 
 import java.time.ZonedDateTime;
+import java.util.LinkedList;
 import java.util.List;
 
 //Створіть систему управління польотами авіакомпанії. Пропоновані
@@ -16,17 +17,32 @@ import java.util.List;
 //        7. Продаж, скасування квитків
 //        8. Розрахунок доходів за заданий період часу
 public class Flight {
-    private static IdGenerator idGenerator;
-    private Long id;
+    final private static IdGenerator idGenerator = new IdGenerator();
+    private final Long id;
     private ZonedDateTime departureTime;
     private ZonedDateTime arrivalTime;
     private Airport departureAirport;
     private Airport arrivalAirport;
     private Aircraft aircraft;
     private boolean isCanceled;
-    private List<Ticket> tickets;
+    final private List<Ticket> tickets;
     private AirCompany airCompany;
 
+    public Flight(final ZonedDateTime departureTime, final ZonedDateTime arrivalTime, final Airport departureAirport, final Airport arrivalAirport, final Aircraft aircraft, final AirCompany airCompany) {
+        this.id = idGenerator.getId();
+        this.departureTime = departureTime;
+        this.arrivalTime = arrivalTime;
+        this.departureAirport = departureAirport;
+        this.arrivalAirport = arrivalAirport;
+        this.aircraft = aircraft;
+        this.airCompany = airCompany;
+        this.tickets = new LinkedList<>();
+
+    }
+
+    public Long getId() {
+        return id;
+    }
 
     public ZonedDateTime getArrivalTime() {
         return arrivalTime;
@@ -75,16 +91,27 @@ public class Flight {
     public List<Ticket> getTickets() {
         return tickets;
     }
+
     public void addTicket(final Ticket ticket) {
         tickets.add(ticket);
     }
 
     public boolean addPassenger(final TicketClass ticketClass, final Passenger passenger) {
-        if (getCountOfLeftTicketsByClass(ticketClass)<=0)
+        if(!canAddPassenger(ticketClass,passenger))
             return false;
-        final Ticket newTicket = new Ticket(passenger,ticketClass,this);
+        final Ticket newTicket = new Ticket(passenger, ticketClass, this);
         passenger.addTicket(newTicket);
         this.addTicket(newTicket);
+        return true;
+    }
+    //only if one passenger can have one seat
+    public boolean canAddPassenger(final TicketClass ticketClass, final Passenger passenger) {
+        if (getCountOfLeftTicketsByClass(ticketClass) <= 0)
+            return false;
+        if (tickets.stream().anyMatch(ticket ->
+                passenger.equals(ticket.getPassenger())
+        ))
+            return false;
         return true;
     }
 
@@ -104,9 +131,10 @@ public class Flight {
     }
 
     public void cancel() {
+        final double returnPercentageIfFlightCanceled = airCompany.getFlightPrices().getReturnPercentageIfFlightCanceled();
         for (final Ticket ticket : tickets) {
             if (ticket != null)
-                ticket.flightCancel();
+                ticket.flightCancel(returnPercentageIfFlightCanceled);
         }
         isCanceled = true;
     }
@@ -132,13 +160,15 @@ public class Flight {
             case First -> {
                 return aircraft.getFirstSeat();
             }
-            case Business ->{
-                return aircraft.getBusinessSeat();}
+            case Business -> {
+                return aircraft.getBusinessSeat();
+            }
             default -> {
                 return 0;
             }
         }
     }
+
     public int getCountOfLeftTickets() {
         int count = 0;
         for (final Ticket ticket : tickets) {
@@ -158,6 +188,7 @@ public class Flight {
         }
         return this.getCountOfSeatsByClass(ticketClass) - count;
     }
+
     public int getCountOfOccupiedTickets() {
         int count = 0;
         for (final Ticket ticket : tickets) {
@@ -186,5 +217,18 @@ public class Flight {
 
     public double getNowTicketPrice(final AirCompany airCompany, final Ticket ticket) {
         return 0;
+    }
+
+    @Override
+    public String toString() {
+        return "Flight" +
+                " id: " + id +
+                "\n departure time: " + departureTime.toString() +
+                "\n arrival time: " + arrivalTime.toString() +
+                "\n departure airport: " + departureAirport.toString() +
+                "\n arrival airport: " + arrivalAirport.toString() +
+                "\n aircraft: " + aircraft.toString() +
+                "\n is canceled: " + isCanceled +
+                "\n air company: " + airCompany.toString();
     }
 }

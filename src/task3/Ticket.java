@@ -5,7 +5,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.NoSuchElementException;
 
 public class Ticket {
-    private static IdGenerator idGenerator;
+    private static final IdGenerator idGenerator = new IdGenerator();
     private final Long id;
     private HandLuggage handLuggage;
     private Passenger passenger;
@@ -16,9 +16,9 @@ public class Ticket {
 
 
     public Ticket(final Passenger passenger, final TicketClass ticketClass, final Flight flight) {
+        this.id = idGenerator.getId();
         this.passenger = passenger;
         this.flight = flight;
-        this.id = idGenerator.getId();
         this.ticketClass = ticketClass;
         this.isCanceled = false;
         this.handLuggage = new HandLuggage(this);
@@ -33,7 +33,13 @@ public class Ticket {
     public void flightCancel(){
         passenger.notifyIfCancelFlight(this);
         price = 0;
-        handLuggage.changeSize(0,0,0,0,false, flight.getAirCompany());
+        handLuggage.cancel();
+    }
+    public void flightCancel(final double returnPercentageIfFlightCanceled){
+        double returnPrice = this.price * returnPercentageIfFlightCanceled;
+        returnPrice+=  handLuggage.cancel();
+        passenger.notifyIfCancelFlight(this, returnPrice);
+        this.price -= returnPrice ;
     }
     public double cancel(){
         return cancel(flight.getAirCompany().getFlightPrices().getReturnPercentageInLess30Day(),

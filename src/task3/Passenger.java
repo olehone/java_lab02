@@ -18,23 +18,21 @@ import java.util.List;
 //        7. Продаж, скасування квитків
 //        8. Розрахунок доходів за заданий період часу
 public class Passenger {
-    public static int howLongSaveTickets = 60; //month
-
     private final static IdGenerator idGenerator = new IdGenerator();
     private final Long id;
-    private String name;
+    private String firstName;
     private String lastName;
     private boolean isBonusEnable;
     private final FlownKilometers flownKilometers;
     private final List<Ticket> tickets = new LinkedList<Ticket>();
-    public Passenger(final String name, final String lastName, final boolean isBonusEnable, final int flownKilometers) {
+    public Passenger(final String firstName, final String lastName, final boolean isBonusEnable, final int flownKilometers) {
         this.id = idGenerator.getId();
-        this.name = name;
+        this.firstName = firstName;
         this.lastName = lastName;
         this.isBonusEnable = isBonusEnable;
         this.flownKilometers = new FlownKilometers(flownKilometers);
     }
-    public boolean removeOldTickets(){
+    public boolean removeOldTickets(final int howLongSaveTickets){
         final ZonedDateTime currentTime = ZonedDateTime.now();
         return tickets.removeIf(ticket ->
                 (ChronoUnit.MONTHS.between(currentTime, ticket.getDepartureTime())>howLongSaveTickets));
@@ -47,9 +45,9 @@ public class Passenger {
         return this.tickets;
     }
 
-    public Passenger(final String name, final String lastName, final boolean isBonusEnable) {
+    public Passenger(final String firstName, final String lastName, final boolean isBonusEnable) {
         this.id = idGenerator.getId();
-        this.name = name;
+        this.firstName = firstName;
         this.lastName = lastName;
         this.isBonusEnable = isBonusEnable;
         this.flownKilometers = new FlownKilometers(0);
@@ -57,11 +55,11 @@ public class Passenger {
     public Long getId(){
         return id;
     }
-    public String getName() {
-        return name;
+    public String getFirstName() {
+        return firstName;
     }
-    public void setName(final String name) {
-        this.name = name;
+    public void setFirstName(final String firstName) {
+        this.firstName = firstName;
     }
 
     public String getLastName() {
@@ -93,19 +91,20 @@ public class Passenger {
     public void setFlownKilometers(final int flownKilometers) {
         this.flownKilometers.setValue(flownKilometers);
     }
-
-    //in month
-    public static void setHowLongSaveTickets(final int howLongSaveTickets) {
-        Passenger.howLongSaveTickets = howLongSaveTickets;
-    }
     public void notifyIfCancelFlight(final Ticket ticket)
     {
         System.out.println("Sorry, we cancel flight on ticket" + ticket.toString());
+    }
+    public void notifyIfCancelFlight(final Ticket ticket, final double returnPrice)
+    {
+        System.out.println("Sorry, we cancel flight on ticket \n"
+                + ticket.toString() + "\n" +
+                " We return: " + returnPrice);
     }
     @Override
     public String toString() {
         return "Passenger" +
                 "\n id: " + this.id +
-                "\n initials:  " + lastName +" " + name;
+                "\n initials:  " + lastName +" " + firstName;
     }
 }
