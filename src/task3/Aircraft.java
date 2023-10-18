@@ -12,7 +12,7 @@ package task3;
 //6. Створення розкладу польотів
 //7. Продаж, скасування квитків
 //8. Розрахунок доходів за заданий період часу
-public class Aircraft {
+public class Aircraft implements HasId {
     private static final IdGenerator idGenerator = new IdGenerator();
     private final Long id;
     private String manufacturer;
@@ -22,7 +22,7 @@ public class Aircraft {
     private int businessSeat;
 
     public Aircraft(final String manufacturer, final String model, final int economySeat, final int firstSeat, final int businessSeat) {
-        this.id = idGenerator.getId();
+        this.id = idGenerator.createId();
         this.manufacturer = manufacturer;
         this.model = model;
         this.economySeat = economySeat;

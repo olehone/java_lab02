@@ -12,19 +12,29 @@ package task3;
 //        6. Створення розкладу польотів
 //        7. Продаж, скасування квитків
 //        8. Розрахунок доходів за заданий період часу
-public class Airport {
-    private final static  IdGenerator idGenerator = new IdGenerator();
+public class Airport implements HasId {
+    private final static IdGenerator idGenerator = new IdGenerator();
     private final Long id;
     private Location location;
-    private final FlightSchedule flightSchedule;
+    private FlightSchedule flightSchedule;
 
     public Airport(final Location location) {
-        this.id = idGenerator.getId();
+        this.id = idGenerator.createId();
         this.location = location;
         this.flightSchedule = new FlightSchedule();
     }
+
+    public void setFlightSchedule(final FlightSchedule flightSchedule) {
+        if (flightSchedule != null)
+            this.flightSchedule = flightSchedule;
+    }
+
     public void addFlight(final Flight flight) {
         flightSchedule.addFlight(flight);
+    }
+
+    public void removeFlight(final Flight flight) {
+        flightSchedule.removeFlight(flight);
     }
 
     public Long getId() {
@@ -34,13 +44,19 @@ public class Airport {
     public FlightSchedule getFlightSchedule() {
         return flightSchedule;
     }
+
     public Location getLocation() {
         return location;
     }
+
     public void setLocation(final Location location) {
         if (location != null) {
             this.location = location;
         }
+    }
+
+    public String schedule() {
+        return flightSchedule.toString();
     }
 
     @Override

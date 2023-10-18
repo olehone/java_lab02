@@ -1,9 +1,8 @@
 package task3;
 
-public class IdGenerator {
+public class IdGenerator{
     private Long Id = 0L;
-    public Long getId(){
-        ++Id;
-        return Id;
+    public Long createId(){
+        return Id++;
     }
 }

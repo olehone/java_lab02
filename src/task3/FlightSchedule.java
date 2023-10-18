@@ -28,6 +28,10 @@ public class FlightSchedule {
         this.scheduleRules = scheduleRules;
         this.flights = new LinkedList<>();
     }
+    public FlightSchedule(final List<Flight> flights) {
+        this.scheduleRules = new ScheduleRules();
+        this.flights = flights;
+    }
     public boolean removeOldFlights() {
         final ZonedDateTime currentTime = ZonedDateTime.now();
         final int howLongSaveFlights = scheduleRules.getHowManyDaysSaveFlights();
@@ -40,10 +44,10 @@ public class FlightSchedule {
                 .filter(flight -> flight.getDepartureTime().isAfter(currentTime.minusHours(scheduleRules.getHowManyHoursShowFlight())))
                 .toList();
     }
-    public List<Flight> getFreshDeparturesFlights(){return getFreshFlights().stream().filter(flight -> flight.getDepartureAirport().getFlightSchedule() ==this).toList();
+    public List<Flight> getFreshDeparturesFlights(){return getFreshFlights().stream().filter(flight -> flight.getDepartureAirport().getFlightSchedule() ==this&& flight.isNotCanceled()).toList();
     }
     public List<Flight> getFreshArrivalFlights(){
-        return getFreshFlights().stream().filter(flight -> flight.getArrivalAirport().getFlightSchedule() ==this).toList();
+        return getFreshFlights().stream().filter(flight -> flight.getArrivalAirport().getFlightSchedule() ==this && flight.isNotCanceled()).toList();
     }
     public List<Flight> getFlights() {
         return flights;
@@ -66,6 +70,11 @@ public class FlightSchedule {
         final StringBuilder str = new StringBuilder();
         str.append("Departures: \n");
         for(final Flight flight: getFreshDeparturesFlights())
+        {
+            str.append(flight.toString());
+        }
+        str.append("Arrivals: \n");
+        for(final Flight flight: getFreshArrivalFlights())
         {
             str.append(flight.toString());
         }

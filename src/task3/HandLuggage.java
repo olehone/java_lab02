@@ -11,18 +11,18 @@ public class HandLuggage {
     private double additionalPrice;
 
     public HandLuggage() {
-        this.id = idGenerator.getId();
+        this.id = idGenerator.createId();
     }
 
     public HandLuggage(final Ticket ticket) {
-        this.id = idGenerator.getId();
+        this.id = idGenerator.createId();
         this.ticket = ticket;
         additionalPrice = 0;
     }
 
     public HandLuggage(final double weight, final int length, final int width, final int height, final Ticket ticket, final double maxUnpaidSideLengthInCm, final double maxUnpaidWeightInKg, final double priceForExtraLengthByCm, final double priceForExtraWeightByKg) {
         this.ticket = ticket;
-        this.id = idGenerator.getId();
+        this.id = idGenerator.createId();
         if (!isAllowed(weight, length, width, height, maxUnpaidWeightInKg, maxUnpaidSideLengthInCm)) {
             this.additionalPrice = 0;
             return;
@@ -36,7 +36,7 @@ public class HandLuggage {
 
     public HandLuggage(final double weight, final int length, final int width, final int height, final Ticket ticket, final LuggageRules luggageRules) {
         this.ticket = ticket;
-        this.id = idGenerator.getId();
+        this.id = idGenerator.createId();
         if (!isAllowed(weight, length, width, height, luggageRules)) {
             this.additionalPrice = 0;
             return;

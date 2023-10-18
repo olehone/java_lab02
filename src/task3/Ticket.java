@@ -4,7 +4,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.NoSuchElementException;
 
-public class Ticket {
+public class Ticket implements HasId {
     private static final IdGenerator idGenerator = new IdGenerator();
     private final Long id;
     private HandLuggage handLuggage;
@@ -16,7 +16,7 @@ public class Ticket {
 
 
     public Ticket(final Passenger passenger, final TicketClass ticketClass, final Flight flight) {
-        this.id = idGenerator.getId();
+        this.id = idGenerator.createId();
         this.passenger = passenger;
         this.flight = flight;
         this.ticketClass = ticketClass;
@@ -57,12 +57,12 @@ public class Ticket {
         if (departureDateTime.isAfter(ZonedDateTime.now())) {
             return 0;
         }
-        handLuggage.changeSize(0,0,0,0,false, flight.getAirCompany());
+        handLuggage.changeSize(0, 0, 0, 0, false, flight.getAirCompany());
         final long hoursTo = ChronoUnit.DAYS.between(ZonedDateTime.now(), departureDateTime);
         isCanceled = true;
         if (hoursTo > 30) {
-            this.price = startPrice * (1-baseReturnPercentage);
-            return startPrice*baseReturnPercentage;
+            this.price = startPrice * (1 - baseReturnPercentage);
+            return startPrice * baseReturnPercentage;
         }
         if (hoursTo > 10) {
             this.price = startPrice * (1 - returnPercentageInLess30Day);
@@ -75,7 +75,6 @@ public class Ticket {
         this.price = startPrice * (1 - returnPercentageInLess3Day);
         return startPrice * returnPercentageInLess3Day;
     }
-
     public double calculatePrice() {
         return calculatePrice(this);
     }

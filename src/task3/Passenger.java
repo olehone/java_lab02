@@ -17,7 +17,7 @@ import java.util.List;
 //        6. Створення розкладу польотів
 //        7. Продаж, скасування квитків
 //        8. Розрахунок доходів за заданий період часу
-public class Passenger {
+public class Passenger implements HasId {
     private final static IdGenerator idGenerator = new IdGenerator();
     private final Long id;
     private String firstName;
@@ -26,7 +26,7 @@ public class Passenger {
     private final FlownKilometers flownKilometers;
     private final List<Ticket> tickets = new LinkedList<Ticket>();
     public Passenger(final String firstName, final String lastName, final boolean isBonusEnable, final int flownKilometers) {
-        this.id = idGenerator.getId();
+        this.id = idGenerator.createId();
         this.firstName = firstName;
         this.lastName = lastName;
         this.isBonusEnable = isBonusEnable;
@@ -37,6 +37,12 @@ public class Passenger {
         return tickets.removeIf(ticket ->
                 (ChronoUnit.MONTHS.between(currentTime, ticket.getDepartureTime())>howLongSaveTickets));
     }
+    public void deleteTickets()
+    {
+        for(final Ticket ticket: tickets){
+            ticket.setPassenger(null);
+        }
+    }
     public void addTicket(final Ticket ticket){
         tickets.add(ticket);
     }
@@ -46,7 +52,7 @@ public class Passenger {
     }
 
     public Passenger(final String firstName, final String lastName, final boolean isBonusEnable) {
-        this.id = idGenerator.getId();
+        this.id = idGenerator.createId();
         this.firstName = firstName;
         this.lastName = lastName;
         this.isBonusEnable = isBonusEnable;

@@ -1,13 +1,13 @@
 package task3;
 
-public class AirCompany {
+public class AirCompany implements HasId {
     private final static IdGenerator idGenerator = new IdGenerator();
     private final Long id;
     private String name;
     private FlightPrices flightPrices;
     private LuggageRules luggageRules;
     public AirCompany(final String name, final FlightPrices flightPrices, final LuggageRules luggageRules) {
-        this.id = idGenerator.getId();
+        this.id = idGenerator.createId();
         this.name = name;
         this.flightPrices = flightPrices;
         this.luggageRules = luggageRules;

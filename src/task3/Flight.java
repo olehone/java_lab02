@@ -16,7 +16,7 @@ import java.util.List;
 //        6. Створення розкладу польотів
 //        7. Продаж, скасування квитків
 //        8. Розрахунок доходів за заданий період часу
-public class Flight {
+public class Flight implements HasId {
     final private static IdGenerator idGenerator = new IdGenerator();
     private final Long id;
     private ZonedDateTime departureTime;
@@ -24,20 +24,64 @@ public class Flight {
     private Airport departureAirport;
     private Airport arrivalAirport;
     private Aircraft aircraft;
+    private int economySeat;
+    private int firstSeat;
+    private int businessSeat;
     private boolean isCanceled;
     final private List<Ticket> tickets;
     private AirCompany airCompany;
 
     public Flight(final ZonedDateTime departureTime, final ZonedDateTime arrivalTime, final Airport departureAirport, final Airport arrivalAirport, final Aircraft aircraft, final AirCompany airCompany) {
-        this.id = idGenerator.getId();
+        this.id = idGenerator.createId();
         this.departureTime = departureTime;
         this.arrivalTime = arrivalTime;
         this.departureAirport = departureAirport;
         this.arrivalAirport = arrivalAirport;
         this.aircraft = aircraft;
+        this.economySeat = aircraft.getEconomySeat();
+        this.firstSeat = aircraft.getFirstSeat();
+        this.businessSeat = aircraft.getBusinessSeat();
         this.airCompany = airCompany;
         this.tickets = new LinkedList<>();
+    }
 
+    public Flight(final ZonedDateTime departureTime, final ZonedDateTime arrivalTime, final Airport departureAirport, final Airport arrivalAirport, final Aircraft aircraft, final int economySeat, final int firstSeat, final int businessSeat, final boolean isCanceled, final AirCompany airCompany) {
+        this.id = idGenerator.createId();
+        this.departureTime = departureTime;
+        this.arrivalTime = arrivalTime;
+        this.departureAirport = departureAirport;
+        this.arrivalAirport = arrivalAirport;
+        this.aircraft = aircraft;
+        this.economySeat = economySeat;
+        this.firstSeat = firstSeat;
+        this.businessSeat = businessSeat;
+        this.isCanceled = isCanceled;
+        this.airCompany = airCompany;
+        this.tickets = new LinkedList<>();
+    }
+
+    public int getEconomySeat() {
+        return economySeat;
+    }
+
+    public void setEconomySeat(final int economySeat) {
+        this.economySeat = economySeat;
+    }
+
+    public int getFirstSeat() {
+        return firstSeat;
+    }
+
+    public void setFirstSeat(final int firstSeat) {
+        this.firstSeat = firstSeat;
+    }
+
+    public int getBusinessSeat() {
+        return businessSeat;
+    }
+
+    public void setBusinessSeat(final int businessSeat) {
+        this.businessSeat = businessSeat;
     }
 
     public Long getId() {
@@ -76,8 +120,8 @@ public class Flight {
         this.departureAirport = departureAirport;
     }
 
-    public boolean isCanceled() {
-        return isCanceled;
+    public boolean isNotCanceled() {
+        return !isCanceled;
     }
 
     public Aircraft getAircraft() {
@@ -115,19 +159,27 @@ public class Flight {
         return true;
     }
 
-    public String getSeatsCountToString() {
+    public String getFlightInfoToString() {
         final int leftEcoTickets = getCountOfLeftTicketsByClass(TicketClass.Economy);
         final int leftFirstTickets = getCountOfLeftTicketsByClass(TicketClass.First);
         final int leftBusinessTickets = getCountOfLeftTicketsByClass(TicketClass.Business);
         final int ecoSeats = aircraft.getEconomySeat();
         final int firstSeats = aircraft.getFirstSeat();
         final int businessSeats = aircraft.getBusinessSeat();
-        return "Flight " + id +
+        return this.toString() +
+                "\n" +
                 "\n Class | Free | Occupied | Total | Base price |" +
                 "\n   Eco |   " + leftEcoTickets + " |       " + (ecoSeats - leftEcoTickets) + " |    " + ecoSeats + " | " + Ticket.calculatePrice(TicketClass.Economy, this, airCompany.getFlightPrices()) + " |" +
                 "\n First |   " + leftFirstTickets + " |       " + (firstSeats - leftFirstTickets) + " |    " + firstSeats + " |" + Ticket.calculatePrice(TicketClass.First, this, airCompany.getFlightPrices()) + " |" +
                 "\n  Buss |   " + leftBusinessTickets + " |       " + (businessSeats - leftBusinessTickets) + " |    " + businessSeats + " |" + Ticket.calculatePrice(TicketClass.Business, this, airCompany.getFlightPrices()) + " |\n" +
                 "\n Total |   " + getCountOfLeftTickets() + " |       " + (ecoSeats - leftEcoTickets + firstSeats - leftFirstTickets + businessSeats - leftBusinessTickets) + " |    " + (ecoSeats + firstSeats + businessSeats) + " |\n";
+    }
+    public double calculateProfit(){
+        double profit = 0;
+        for (final Ticket ticket: tickets){
+            profit += ticket.getFullPrice();
+        }
+        return profit;
     }
 
     public void cancel() {
@@ -149,19 +201,19 @@ public class Flight {
     }
 
     public int getCountOfSeats() {
-        return aircraft.getEconomySeat() + aircraft.getFirstSeat() + aircraft.getBusinessSeat();
+        return economySeat+ firstSeat +businessSeat;
     }
 
     public int getCountOfSeatsByClass(final TicketClass ticketClass) {
         switch (ticketClass) {
             case Economy -> {
-                return aircraft.getEconomySeat();
+                return economySeat;
             }
             case First -> {
-                return aircraft.getFirstSeat();
+                return firstSeat;
             }
             case Business -> {
-                return aircraft.getBusinessSeat();
+                return businessSeat;
             }
             default -> {
                 return 0;
@@ -214,11 +266,6 @@ public class Flight {
     public void setAirCompany(final AirCompany airCompany) {
         this.airCompany = airCompany;
     }
-
-    public double getNowTicketPrice(final AirCompany airCompany, final Ticket ticket) {
-        return 0;
-    }
-
     @Override
     public String toString() {
         return "Flight" +
