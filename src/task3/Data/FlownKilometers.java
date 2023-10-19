@@ -1,4 +1,4 @@
-package task3;
+package task3.Data;
 public class FlownKilometers{
     private int value;
     public FlownKilometers(final int value){
@@ -15,6 +15,4 @@ public class FlownKilometers{
     public void addKilometers(final int flownKilometers){
         this.value += flownKilometers;
     }
-    public void subtractKilometers(final int flownKilometers){
-        this.value -= flownKilometers;
-    }}
+}

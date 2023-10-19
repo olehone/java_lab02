@@ -1,11 +1,29 @@
 package task3;
 
+import task3.Data.Location;
+import task3.Data.TicketClass;
+import task3.Identified.*;
+import task3.Rules.FlightRules;
+import task3.Rules.LuggageRules;
+
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-
+//Створіть систему управління польотами авіакомпанії. Пропоновані
+//класи для ієрархії: літак, аеропорт, пасажир, рейс, розклад польотів,
+//квиток.
+//Функціональні вимоги:
+//1. Створення, видалення, редагування літака
+//2. Створення, видалення, редагування рейсу
+//3. Створення, видалення, редагування пасажирів
+//4. Створення, видалення, редагування айропорта
+//5. Відображення розкладів польотів
+//6. Створення розкладу польотів
+//7. Продаж, скасування квитків
+//8. Розрахунок доходів за заданий період часу
 public class FlightService {
     final private List<Passenger> passengers;
     final private List<Aircraft> aircrafts;
@@ -18,11 +36,9 @@ public class FlightService {
     final private AirCompany defaultAirCompany;
     final private Airport defaultAirport;
     final private Flight defaultFlight;
-    final private Ticket defaultTicket;
-    final private FlightPrices defaultFlightPrices;
+    final private FlightRules defaultFlightRules;
     final private LuggageRules defaultLuggageRules;
     final private ZonedDateTime defaultTime;
-    final private HandLuggage defaultHandLuggage;
 
 
     //make Lists with firsts defaults object for deleting
@@ -35,16 +51,14 @@ public class FlightService {
 
         //if remove any object, references go to default objects
         this.defaultTime = ZonedDateTime.now();
-        this.defaultFlightPrices = new FlightPrices(0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.);
+        this.defaultFlightRules = new FlightRules(0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.);
         this.defaultLuggageRules = new LuggageRules(0., 0., 0., 0., 0., 0.0);
         this.defaultLocation = new Location("REMOVED", "LOCATION", "REMOVED", 0., 0., "+0");
         this.defaultPassenger = new Passenger("REMOVED", "PASSENGER", false, 0);
         this.defaultAircraft = new Aircraft("REMOVED", "AIRCRAFT", 1, 0, 0);
-        this.defaultAirCompany = new AirCompany("REMOVED", defaultFlightPrices, defaultLuggageRules);
+        this.defaultAirCompany = new AirCompany("REMOVED", defaultFlightRules, defaultLuggageRules);
         this.defaultAirport = new Airport("REMOVED", defaultLocation);
         this.defaultFlight = new Flight(defaultTime, defaultTime, defaultAirport, defaultAirport, defaultAircraft, defaultAirCompany);
-        this.defaultTicket = new Ticket(defaultPassenger, TicketClass.Economy, defaultFlight);
-        this.defaultHandLuggage = new HandLuggage(defaultTicket);
         this.defaultFlight.cancel();
     }
 
@@ -88,14 +102,42 @@ public class FlightService {
             return "No info";
         return flight.toString();
     }
-
-    public Long addTicket(final Long flightId, final Long passengerId, final TicketClass ticketClass) {
+    public boolean cancelTicket(final Long ticketId) {
+        final Ticket ticket = getTicketById(ticketId);
+        if(ticket==null)
+            return false;
+        ticket.cancel();
+        return true;
+    }
+    public boolean cancelTicket(final Long passengerId, final Long flightId) {
+        final Ticket ticket = getTicketByFlightAndPassengerId(passengerId, flightId);
+        if(ticket==null)
+            return false;
+        ticket.cancel();
+        return true;
+    }
+    public Ticket getTicketById(final Long ticketId) {
+        return flights.stream()
+                .flatMap(flight -> flight.getTickets().stream())
+                .filter(ticket -> ticketId.equals(ticket.getId()))
+                .findFirst()
+                .orElse(null);
+    }
+    public Ticket getTicketByFlightAndPassengerId(final Long passengerId, final Long flightId) {
+        final Passenger passenger = getPassengerById(passengerId);
+        if(passenger==null||passenger.getTickets().size()<1)
+            return null;
+        return passenger.getTickets().stream()
+                .filter(ticket -> flightId.equals(ticket.getFlight().getId()))
+                .findFirst().orElse(null);
+    }
+    public Long sellTicket(final Long flightId, final Long passengerId, final TicketClass ticketClass) {
         final Flight flight = getFlightById(flightId);
         final Passenger passenger = getPassengerById(passengerId);
-        return addTicket(flight, passenger, ticketClass);
+        return sellTicket(flight, passenger, ticketClass);
     }
 
-    private Long addTicket(final Flight flight, final Passenger passenger, final TicketClass ticketClass) {
+    private Long sellTicket(final Flight flight, final Passenger passenger, final TicketClass ticketClass) {
         if (flight == null || ticketClass == null || flight.getCountOfLeftTicketsByClass(ticketClass) <= 0 || passenger == null)
             return null;
         final Ticket newTicket = new Ticket(passenger, ticketClass, flight);
@@ -105,17 +147,17 @@ public class FlightService {
     }
 
     public Long addAirCompany(final String name, final double baseEconomyCost, final double baseFirstCost, final double baseBusinessCost, final double allowCancelPercentage, final double percentageMarkupForLastTicket, final double percentageDiscountIfAllCancel, final double pricePerKm, final double coefficientOfFlownKilometers, final double returnPercentageInLess3Day, final double returnPercentageInLess10Day, final double returnPercentageInLess30Day, final double baseReturnPercentage, final double returnPercentageIfFlightCanceled, final double maxUnpaidWeightInKg, final double maxUnpaidSideLengthInCm, final double priceForExtraWeightByKg, final double priceForExtraLengthByCm, final double maxWeightInKg, final double maxSideLengthInCm) {
-        final FlightPrices newFlightPrices = new FlightPrices(baseEconomyCost, baseFirstCost, baseBusinessCost, allowCancelPercentage, percentageMarkupForLastTicket, percentageDiscountIfAllCancel, pricePerKm, coefficientOfFlownKilometers, returnPercentageInLess3Day, returnPercentageInLess10Day, returnPercentageInLess30Day, baseReturnPercentage, returnPercentageIfFlightCanceled);
+        final FlightRules newFlightRules = new FlightRules(baseEconomyCost, baseFirstCost, baseBusinessCost, allowCancelPercentage, percentageMarkupForLastTicket, percentageDiscountIfAllCancel, pricePerKm, coefficientOfFlownKilometers, returnPercentageInLess3Day, returnPercentageInLess10Day, returnPercentageInLess30Day, baseReturnPercentage, returnPercentageIfFlightCanceled);
         final LuggageRules newLuggageRules = new LuggageRules(maxUnpaidWeightInKg, maxUnpaidSideLengthInCm, priceForExtraWeightByKg, priceForExtraLengthByCm, maxWeightInKg, maxSideLengthInCm);
-        return addAirCompany(name, newFlightPrices, newLuggageRules);
+        return addAirCompany(name, newFlightRules, newLuggageRules);
     }
 
-    public Long addAirCompany(final String name, final FlightPrices flightPrices, final LuggageRules luggageRules) {
-        if (flightPrices == null)
+    public Long addAirCompany(final String name, final FlightRules flightRules, final LuggageRules luggageRules) {
+        if (flightRules == null)
             return null;
         if (luggageRules == null)
             return null;
-        final AirCompany newAirCompany = new AirCompany(name, flightPrices, luggageRules);
+        final AirCompany newAirCompany = new AirCompany(name, flightRules, luggageRules);
         airCompanies.add(newAirCompany);
         return newAirCompany.getId();
     }
@@ -229,20 +271,20 @@ public class FlightService {
     }
 
     public boolean changeAirCompany(final Long airCompanyId, final String name, final double baseEconomyCost, final double baseFirstCost, final double baseBusinessCost, final double allowCancelPercentage, final double percentageMarkupForLastTicket, final double percentageDiscountIfAllCancel, final double pricePerKm, final double coefficientOfFlownKilometers, final double returnPercentageInLess3Day, final double returnPercentageInLess10Day, final double returnPercentageInLess30Day, final double baseReturnPercentage, final double returnPercentageIfFlightCanceled, final double maxUnpaidWeightInKg, final double maxUnpaidSideLengthInCm, final double priceForExtraWeightByKg, final double priceForExtraLengthByCm, final double maxWeightInKg, final double maxSideLengthInCm) {
-        final FlightPrices newFlightPrices = new FlightPrices(baseEconomyCost, baseFirstCost, baseBusinessCost, allowCancelPercentage, percentageMarkupForLastTicket, percentageDiscountIfAllCancel, pricePerKm, coefficientOfFlownKilometers, returnPercentageInLess3Day, returnPercentageInLess10Day, returnPercentageInLess30Day, baseReturnPercentage, returnPercentageIfFlightCanceled);
+        final FlightRules newFlightRules = new FlightRules(baseEconomyCost, baseFirstCost, baseBusinessCost, allowCancelPercentage, percentageMarkupForLastTicket, percentageDiscountIfAllCancel, pricePerKm, coefficientOfFlownKilometers, returnPercentageInLess3Day, returnPercentageInLess10Day, returnPercentageInLess30Day, baseReturnPercentage, returnPercentageIfFlightCanceled);
         final LuggageRules newLuggageRules = new LuggageRules(maxUnpaidWeightInKg, maxUnpaidSideLengthInCm, priceForExtraWeightByKg, priceForExtraLengthByCm, maxWeightInKg, maxSideLengthInCm);
-        return changeAirCompany(airCompanyId, name, newFlightPrices, newLuggageRules);
+        return changeAirCompany(airCompanyId, name, newFlightRules, newLuggageRules);
     }
 
-    public boolean changeAirCompany(final Long airCompanyId, final String name, final FlightPrices flightPrices, final LuggageRules luggageRules) {
-        return changeAirCompany(getAirCompanyById(airCompanyId), name, flightPrices, luggageRules);
+    public boolean changeAirCompany(final Long airCompanyId, final String name, final FlightRules flightRules, final LuggageRules luggageRules) {
+        return changeAirCompany(getAirCompanyById(airCompanyId), name, flightRules, luggageRules);
     }
 
-    private boolean changeAirCompany(final AirCompany airCompany, final String name, final FlightPrices flightPrices, final LuggageRules luggageRules) {
+    private boolean changeAirCompany(final AirCompany airCompany, final String name, final FlightRules flightRules, final LuggageRules luggageRules) {
         if (airCompany == null)
             return false;
-        if (flightPrices != null)
-            airCompany.setFlightPrices(flightPrices);
+        if (flightRules != null)
+            airCompany.setFlightPrices(flightRules);
         if (luggageRules != null)
             airCompany.setLuggageRules(luggageRules);
         if (name != null)
@@ -388,6 +430,39 @@ public class FlightService {
                 .orElse(null);
     }
 
+    public List<Flight> getFlightsByCities(final String departureCity, final String arrivalCity) {
+        if (departureCity == null || arrivalCity == null)
+            return null;
+        return flights.stream()
+                .filter(flight ->
+                        (departureCity.equals(flight.getDepartureAirport().getLocation().getCity()) &&
+                                arrivalCity.equals((flight.getArrivalAirport().getLocation().getCity()))))
+                .sorted(Comparator.comparing(Flight::getDepartureTime))
+                .toList();
+    }
+
+    public List<Flight> getFlightsByCountriesAndTime(final String departureCountry, final String arrivalCountry, final ZonedDateTime earliestTime, final ZonedDateTime latestTime) {
+        if (departureCountry == null || arrivalCountry == null)
+            return null;
+        return flights.stream()
+                .filter(flight ->
+                        departureCountry.equals(flight.getDepartureAirport().getLocation().getCountry()) &&
+                                arrivalCountry.equals(flight.getArrivalAirport().getLocation().getCountry()) &&
+                                earliestTime.isBefore(flight.getDepartureTime()) &&
+                                latestTime.isAfter(flight.getArrivalTime()))
+                .sorted(Comparator.comparing(Flight::getDepartureTime))
+                .toList();
+
+    }
+
+    public String getFlightsByCountriesAndTimeToString(final String departureCountry, final String arrivalCountry, final ZonedDateTime earliestTime, final ZonedDateTime latestTime) {
+        return flightsToString(getFlightsByCountriesAndTime(departureCountry, arrivalCountry, earliestTime, latestTime));
+    }
+
+    public String getFlightsByCitiesToString(final String departureCity, final String arrivalCity) {
+        return flightsToString(getFlightsByCities(departureCity, arrivalCity));
+    }
+
     public Aircraft getAircraftById(final Long aircraftId) {
         if (aircraftId == null)
             return null;
@@ -419,6 +494,12 @@ public class FlightService {
     }
 
     public String flightsToString() {
+        return flightsToString(this.flights);
+    }
+
+    public String flightsToString(final List<Flight> flights) {
+        if (flights == null || flights.size() < 1)
+            return "Empty flights list";
         final StringBuilder string = new StringBuilder();
         for (final Flight flight : flights) {
             string.append(flight.toString());
@@ -469,23 +550,6 @@ public class FlightService {
 
         }
         return string.toString();
-    }
-
-
-    public List<AirCompany> getAirCompanies() {
-        return airCompanies;
-    }
-
-    public List<Airport> getAirports() {
-        return airports;
-    }
-
-    public List<Flight> getFlights() {
-        return flights;
-    }
-
-    public Passenger getDefaultPassenger() {
-        return defaultPassenger;
     }
 
     @Override

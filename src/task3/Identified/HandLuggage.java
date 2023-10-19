@@ -1,6 +1,10 @@
-package task3;
+package task3.Identified;
 
-public class HandLuggage implements HasId{
+import task3.IdGenerator;
+import task3.Interfaces.HasId;
+import task3.Rules.LuggageRules;
+
+public class HandLuggage implements HasId {
     private static final IdGenerator idGenerator = new IdGenerator();
     private final Long id;
     private Ticket ticket;

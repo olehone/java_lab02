@@ -1,4 +1,9 @@
-package task3;
+package task3.Identified;
+
+import task3.FlightSchedule;
+import task3.IdGenerator;
+import task3.Interfaces.HasId;
+import task3.Data.Location;
 
 //Створіть систему управління польотами авіакомпанії. Пропоновані
 //        класи для ієрархії: літак, аеропорт, пасажир, рейс, розклад польотів,

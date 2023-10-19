@@ -1,4 +1,8 @@
-package task3;
+package task3.Identified;
+
+import task3.*;
+import task3.Data.TicketClass;
+import task3.Interfaces.HasId;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -167,11 +171,11 @@ public class Flight implements HasId {
         final int leftBusinessTickets = getCountOfLeftTicketsByClass(TicketClass.Business);
 
         final String format = "%-8s| %5s| %9s| %6s| %12s| %9s |\n";
-        final String header = String.format(format, "Class", "Free", "Occupied", "Total", "Price", "Profit");
+        final String header = String.format(format, "Class", "Free", "Occupied", "Total", "Price to buy", "Profit");
         final String divider = "-----------------------------------------------------------\n";
-        final String ecoRow = String.format(format, "Economy", leftEcoTickets, (economySeat - leftEcoTickets), economySeat, Ticket.calculatePrice(TicketClass.Economy, this, airCompany.getFlightPrices()), calculateProfitByClass(TicketClass.Economy));
-        final String firstRow = String.format(format, "First", leftFirstTickets, (firstSeat - leftFirstTickets), firstSeat, Ticket.calculatePrice(TicketClass.First, this, airCompany.getFlightPrices()), calculateProfitByClass(TicketClass.First));
-        final String businessRow = String.format(format, "Business", leftBusinessTickets, (businessSeat - leftBusinessTickets), businessSeat, Ticket.calculatePrice(TicketClass.Business, this, airCompany.getFlightPrices()), calculateProfitByClass(TicketClass.Business));
+        final String ecoRow = String.format(format, "Economy", leftEcoTickets, (economySeat - leftEcoTickets), economySeat, Calculations.calculatePrice(TicketClass.Economy, this, airCompany.getFlightPrices()), calculateProfitByClass(TicketClass.Economy));
+        final String firstRow = String.format(format, "First", leftFirstTickets, (firstSeat - leftFirstTickets), firstSeat, Calculations.calculatePrice(TicketClass.First, this, airCompany.getFlightPrices()), calculateProfitByClass(TicketClass.First));
+        final String businessRow = String.format(format, "Business", leftBusinessTickets, (businessSeat - leftBusinessTickets), businessSeat, Calculations.calculatePrice(TicketClass.Business, this, airCompany.getFlightPrices()), calculateProfitByClass(TicketClass.Business));
         final String totalRow = String.format(format, "Total", getCountOfLeftTickets(), (economySeat - leftEcoTickets + firstSeat - leftFirstTickets + businessSeat - leftBusinessTickets), (economySeat + firstSeat + businessSeat), "", calculateProfit());
 
         return header + divider + ecoRow + firstRow + businessRow + divider + totalRow;
@@ -266,7 +270,7 @@ public class Flight implements HasId {
     public double getDistance() {
         if (arrivalAirport == null || departureAirport == null)
             return 0;
-        return Location.calculateDistanceByCoordinates(arrivalAirport.getLocation().getLatitude(),
+        return Calculations.calculateDistanceByCoordinates(arrivalAirport.getLocation().getLatitude(),
                 arrivalAirport.getLocation().getLongitude(),
                 departureAirport.getLocation().getLatitude(),
                 departureAirport.getLocation().getLongitude());

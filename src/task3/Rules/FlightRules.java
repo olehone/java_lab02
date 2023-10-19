@@ -1,6 +1,6 @@
-package task3;
+package task3.Rules;
 
-public class FlightPrices {
+public class FlightRules {
     private double baseEconomyCost;
     private double baseFirstCost;
     private double baseBusinessCost;
@@ -14,7 +14,7 @@ public class FlightPrices {
     private double returnPercentageInLess30Day;
     private double baseReturnPercentage;
     private double returnPercentageIfFlightCanceled;
-    public FlightPrices(final double baseEconomyCost, final double baseFirstCost, final double baseBusinessCost, final double allowCancelPercentage, final double percentageMarkupForLastTicket, final double percentageDiscountIfAllCancel, final double pricePerKm, final double coefficientOfFlownKilometers, final double returnPercentageInLess3Day, final double returnPercentageInLess10Day, final double returnPercentageInLess30Day, final double baseReturnPercentage, final double returnPercentageIfFlightCanceled) {
+    public FlightRules(final double baseEconomyCost, final double baseFirstCost, final double baseBusinessCost, final double allowCancelPercentage, final double percentageMarkupForLastTicket, final double percentageDiscountIfAllCancel, final double pricePerKm, final double coefficientOfFlownKilometers, final double returnPercentageInLess3Day, final double returnPercentageInLess10Day, final double returnPercentageInLess30Day, final double baseReturnPercentage, final double returnPercentageIfFlightCanceled) {
         this.baseEconomyCost = baseEconomyCost;
         this.baseFirstCost = baseFirstCost;
         this.baseBusinessCost = baseBusinessCost;

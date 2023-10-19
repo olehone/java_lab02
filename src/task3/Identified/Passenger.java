@@ -1,4 +1,8 @@
-package task3;
+package task3.Identified;
+
+import task3.IdGenerator;
+import task3.Data.FlownKilometers;
+import task3.Interfaces.HasId;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;

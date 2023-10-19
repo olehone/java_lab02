@@ -1,4 +1,7 @@
-package task3;
+package task3.Identified;
+
+import task3.Interfaces.HasId;
+import task3.IdGenerator;
 
 //Створіть систему управління польотами авіакомпанії. Пропоновані
 //класи для ієрархії: літак, аеропорт, пасажир, рейс, розклад польотів,
@@ -13,7 +16,7 @@ package task3;
 //7. Продаж, скасування квитків
 //8. Розрахунок доходів за заданий період часу
 public class Aircraft implements HasId {
-    private static final IdGenerator idGenerator = new IdGenerator();
+    private final static IdGenerator idGenerator = new IdGenerator();
     private final Long id;
     private String manufacturer;
     private String model;
@@ -33,19 +36,9 @@ public class Aircraft implements HasId {
     public Long getId() {
         return id;
     }
-
-    public String getManufacturer() {
-        return manufacturer;
-    }
-
     public void setManufacturer(final String manufacturer) {
         this.manufacturer = manufacturer;
     }
-
-    public String getModel() {
-        return model;
-    }
-
     public void setModel(final String model) {
         this.model = model;
     }

@@ -1,4 +1,4 @@
-package task3;
+package task3.Rules;
 
 public class LuggageRules {
     private double maxUnpaidWeightInKg;

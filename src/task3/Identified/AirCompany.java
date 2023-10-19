@@ -1,16 +1,21 @@
-package task3;
+package task3.Identified;
+
+import task3.Interfaces.HasId;
+import task3.Rules.FlightRules;
+import task3.IdGenerator;
+import task3.Rules.LuggageRules;
 
 public class AirCompany implements HasId {
     private final static IdGenerator idGenerator = new IdGenerator();
     private final Long id;
     private String name;
-    private FlightPrices flightPrices;
+    private FlightRules flightRules;
     private LuggageRules luggageRules;
 
-    public AirCompany(final String name, final FlightPrices flightPrices, final LuggageRules luggageRules) {
+    public AirCompany(final String name, final FlightRules flightRules, final LuggageRules luggageRules) {
         this.id = idGenerator.createId();
         this.name = name;
-        this.flightPrices = flightPrices;
+        this.flightRules = flightRules;
         this.luggageRules = luggageRules;
     }
 
@@ -18,20 +23,16 @@ public class AirCompany implements HasId {
         return id;
     }
 
-    public String getName() {
-        return name;
-    }
-
     public void setName(final String name) {
         this.name = name;
     }
 
-    public FlightPrices getFlightPrices() {
-        return flightPrices;
+    public FlightRules getFlightPrices() {
+        return flightRules;
     }
 
-    public void setFlightPrices(final FlightPrices flightPrices) {
-        this.flightPrices = flightPrices;
+    public void setFlightPrices(final FlightRules flightRules) {
+        this.flightRules = flightRules;
     }
 
     public LuggageRules getLuggageRules() {

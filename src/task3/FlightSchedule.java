@@ -1,7 +1,9 @@
 package task3;
 
+import task3.Identified.Flight;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,44 +20,53 @@ import java.util.List;
 //        7. Продаж, скасування квитків
 //        8. Розрахунок доходів за заданий період часу
 public class FlightSchedule {
-    private ScheduleRules scheduleRules;
     private final List<Flight> flights;
 
     public FlightSchedule() {
-        this.scheduleRules = new ScheduleRules();
-        this.flights = new LinkedList<>();
-    }
-
-    public FlightSchedule(final ScheduleRules scheduleRules) {
-        this.scheduleRules = scheduleRules;
         this.flights = new LinkedList<>();
     }
 
     public FlightSchedule(final List<Flight> flights) {
-        this.scheduleRules = new ScheduleRules();
         this.flights = flights;
     }
 
-    public boolean removeOldFlights() {
+    public boolean removeOldFlights(final int howManyDaysSaveFlights) {
         final ZonedDateTime currentTime = ZonedDateTime.now();
-        final int howLongSaveFlights = scheduleRules.getHowManyDaysSaveFlights();
         return flights.removeIf(flight ->
-                (ChronoUnit.DAYS.between(currentTime, flight.getDepartureTime()) > howLongSaveFlights));
+                (ChronoUnit.DAYS.between(currentTime, flight.getDepartureTime()) > howManyDaysSaveFlights));
     }
 
     public List<Flight> getFreshFlights() {
+        return getFreshFlights(3);
+    }
+
+    public List<Flight> getFreshFlights(final int howManyHoursShowFlight) {
         final ZonedDateTime currentTime = ZonedDateTime.now();
         return flights.stream()
-                .filter(flight -> flight.getDepartureTime().isAfter(currentTime.minusHours(scheduleRules.getHowManyHoursShowFlight())))
+                .filter(flight -> flight.getDepartureTime().isAfter(currentTime.minusHours(howManyHoursShowFlight)))
                 .toList();
     }
 
     public List<Flight> getFreshDeparturesFlights() {
-        return getFreshFlights().stream().filter(flight -> flight.getDepartureAirport().getFlightSchedule() == this && flight.isNotCanceled()).toList();
+        return getFreshDeparturesFlights(3);
     }
 
     public List<Flight> getFreshArrivalFlights() {
-        return getFreshFlights().stream().filter(flight -> flight.getArrivalAirport().getFlightSchedule() == this && flight.isNotCanceled()).toList();
+        return getFreshArrivalFlights(3);
+    }
+
+    public List<Flight> getFreshDeparturesFlights(final int howManyHoursShowFlight) {
+        return getFreshFlights(howManyHoursShowFlight).stream()
+                .filter(flight -> flight.getDepartureAirport().getFlightSchedule() == this && flight.isNotCanceled())
+                .sorted(Comparator.comparing(Flight::getDepartureTime))
+                .toList();
+    }
+
+    public List<Flight> getFreshArrivalFlights(final int howManyHoursShowFlight) {
+        return getFreshFlights(howManyHoursShowFlight).stream()
+                .filter(flight -> flight.getArrivalAirport().getFlightSchedule() == this && flight.isNotCanceled())
+                .sorted(Comparator.comparing(Flight::getDepartureTime))
+                .toList();
     }
 
     public List<Flight> getFlights() {
@@ -70,23 +81,19 @@ public class FlightSchedule {
         this.flights.remove(flight);
     }
 
-    public ScheduleRules getScheduleRules() {
-        return scheduleRules;
-    }
-
-    public void setScheduleRules(final ScheduleRules scheduleRules) {
-        this.scheduleRules = scheduleRules;
-    }
-
     @Override
     public String toString() {
+        return toString(3);
+    }
+
+    public String toString(final int howManyHoursShowFlight) {
         final StringBuilder str = new StringBuilder();
         str.append("Departures: \n");
-        for (final Flight flight : getFreshDeparturesFlights()) {
+        for (final Flight flight : getFreshDeparturesFlights(howManyHoursShowFlight)) {
             str.append(flight.toShortString()).append("\n");
         }
         str.append("Arrivals: \n");
-        for (final Flight flight : getFreshArrivalFlights()) {
+        for (final Flight flight : getFreshArrivalFlights(howManyHoursShowFlight)) {
             str.append(flight.toShortString()).append("\n");
         }
         return str.toString();
