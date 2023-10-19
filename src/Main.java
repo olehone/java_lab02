@@ -1,4 +1,5 @@
 import task3.FlightService;
+import task3.TicketClass;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -40,29 +41,64 @@ public class Main {
 //        System.out.println(sphere.getArea() + " is sphere area");
 //        System.out.println(cube.getVolume() + " is cube volume");
 //        System.out.println(pyramid.getVolume() + " is pyramid volume");
+
+
         final FlightService service = new FlightService();
         service.addPassenger("Олена", "Іваненко", false);
         service.addPassenger("Андрій", "Коваль", true);
         service.addPassenger("Ірина", "Мельник", false);
+        service.addPassenger("Олена", "Іваненко", false);
+        service.addPassenger("Андрій", "Коваль", true);
+        service.addPassenger("Ірина", "Мельник", false);
+        service.addPassenger("Олена", "Іваненко", false);
+        service.addPassenger("Андрій", "Коваль", true);
+        service.addPassenger("Ірина", "Мельник", false);
+        service.addPassenger("Олена", "Іваненко", false);
+        service.addPassenger("Андрій", "Коваль", true);
+        service.addPassenger("Ірина", "Мельник", false);
+        service.addPassenger("Олена", "Іваненко", false);
+        service.addPassenger("Андрій", "Коваль", true);
+        service.addPassenger("Ірина", "Мельник", false);
+        service.addPassenger("Олена", "Іваненко", false);
+        service.addPassenger("Андрій", "Коваль", true);
+        service.addPassenger("Ірина", "Мельник", false);
 
-        service.addAirport("123 Main St", "Ukraine", "Kyiv", 50.4501, 30.5234, ZoneId.of("Europe/Kiev"));
-        service.addAirport("456 Elm St", "United States", "New York", 40.7128, -74.0060, ZoneId.of("America/New_York"));
+        service.addAirport("KYIV", "123 Main St", "Ukraine", "Kyiv", 50.4501, 30.5234, ZoneId.of("Europe/Kiev"));
+        service.addAirport("NY", "456 Elm St", "United States", "New York", 40.7128, -74.0060, ZoneId.of("America/New_York"));
 
-        service.addAirCompany("Lufthansa", 950.0, 1100.0, 1400.0, 0.08, 0.22, 0.3, 0.01, 0.0, 0.5, 0.75, 0.90, 0.95, 1.08, 25.0, 120.0, 90.0, 14.5, 35.0, 150.0);
+        service.addAirCompany("Lufthansa", 950.0, 1150.0, 1400.0, 0.08, 0.2, 0.5, 0.01, 0.001, 0.5, 0.75, 0.90, 0.95, 1.08, 25.0, 120.0, 90.0, 14.5, 35.0, 150.0);
         service.addAirCompany("Delta Air Lines", 1200.0, 1700.0, 2000.0, 0.12, 0.2, 0.6, 0.005, 0.1, 0.70, 0.90, 0.95, 1, 1.12, 15.0, 80.0, 150.0, 26.5, 25.0, 100.0);
 
         service.addAircraft("Boeing", "747", 110, 30, 16);
         service.addAircraft("Airbus", "A340", 30, 50, 30);
 
+        service.addFlight(ZonedDateTime.now(), ZonedDateTime.now(), 1L, 2L, 1L, 1L);
+
+        service.addTicket(1L, 1L, TicketClass.Business);
+        for(int i = 1; i<100; i++){
+            service.addTicket(1L, 1L, TicketClass.Economy);
+        }
+        System.out.printf(service.toString());
         System.out.println(service.toString());
 
-        service.addTicket(1L,2L, null);
+
+        service.addTicket(1L, 2L, TicketClass.Economy);
+
+
+        System.out.println(service.getTicketsByFlightIdToString(1L));
+        System.out.println(service.getTicketsByFlightIdToString(2L));
+
+
         service.changePassenger(3L, "Змінений", "Користувач", false);
-        service.changeAircraft(2L, "Змінено", "Змінено", 10, 10, 10);
+        service.changeAircraft(1L, "Змінений", "Змінений", 12, 12, 12);
         service.changeAirport(2L, "Змінено", "Ukraine", "Kyiv", 50.4501, 30.5234, ZoneId.of("Europe/Kiev"));
         System.out.println(service.toString());
-
-
+        service.deletePassenger(1L);
+        service.deleteAircraft(1L);
+        service.deleteAirport(1L);
+        service.deleteFlight(1L);
+        System.out.println(service.toString());
+        System.out.println(service.getFlightById(1L).getTickets().get(1).getPassenger().toString());
         final ZonedDateTime arrival1 = ZonedDateTime.of(2023, 10, 15, 8, 30, 0, 0, ZoneId.of("Europe/Kiev"));
         final ZonedDateTime departure1 = ZonedDateTime.of(2023, 10, 15, 12, 45, 0, 0, ZoneId.of("America/New_York"));
 

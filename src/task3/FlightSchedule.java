@@ -20,47 +20,60 @@ import java.util.List;
 public class FlightSchedule {
     private ScheduleRules scheduleRules;
     private final List<Flight> flights;
+
     public FlightSchedule() {
         this.scheduleRules = new ScheduleRules();
         this.flights = new LinkedList<>();
     }
+
     public FlightSchedule(final ScheduleRules scheduleRules) {
         this.scheduleRules = scheduleRules;
         this.flights = new LinkedList<>();
     }
+
     public FlightSchedule(final List<Flight> flights) {
         this.scheduleRules = new ScheduleRules();
         this.flights = flights;
     }
+
     public boolean removeOldFlights() {
         final ZonedDateTime currentTime = ZonedDateTime.now();
         final int howLongSaveFlights = scheduleRules.getHowManyDaysSaveFlights();
         return flights.removeIf(flight ->
                 (ChronoUnit.DAYS.between(currentTime, flight.getDepartureTime()) > howLongSaveFlights));
     }
+
     public List<Flight> getFreshFlights() {
         final ZonedDateTime currentTime = ZonedDateTime.now();
         return flights.stream()
                 .filter(flight -> flight.getDepartureTime().isAfter(currentTime.minusHours(scheduleRules.getHowManyHoursShowFlight())))
                 .toList();
     }
-    public List<Flight> getFreshDeparturesFlights(){return getFreshFlights().stream().filter(flight -> flight.getDepartureAirport().getFlightSchedule() ==this&& flight.isNotCanceled()).toList();
+
+    public List<Flight> getFreshDeparturesFlights() {
+        return getFreshFlights().stream().filter(flight -> flight.getDepartureAirport().getFlightSchedule() == this && flight.isNotCanceled()).toList();
     }
-    public List<Flight> getFreshArrivalFlights(){
-        return getFreshFlights().stream().filter(flight -> flight.getArrivalAirport().getFlightSchedule() ==this && flight.isNotCanceled()).toList();
+
+    public List<Flight> getFreshArrivalFlights() {
+        return getFreshFlights().stream().filter(flight -> flight.getArrivalAirport().getFlightSchedule() == this && flight.isNotCanceled()).toList();
     }
+
     public List<Flight> getFlights() {
         return flights;
     }
+
     public void addFlight(final Flight flight) {
         this.flights.add(flight);
     }
+
     public void removeFlight(final Flight flight) {
         this.flights.remove(flight);
     }
+
     public ScheduleRules getScheduleRules() {
         return scheduleRules;
     }
+
     public void setScheduleRules(final ScheduleRules scheduleRules) {
         this.scheduleRules = scheduleRules;
     }
@@ -69,14 +82,12 @@ public class FlightSchedule {
     public String toString() {
         final StringBuilder str = new StringBuilder();
         str.append("Departures: \n");
-        for(final Flight flight: getFreshDeparturesFlights())
-        {
-            str.append(flight.toString());
+        for (final Flight flight : getFreshDeparturesFlights()) {
+            str.append(flight.toShortString()).append("\n");
         }
         str.append("Arrivals: \n");
-        for(final Flight flight: getFreshArrivalFlights())
-        {
-            str.append(flight.toString());
+        for (final Flight flight : getFreshArrivalFlights()) {
+            str.append(flight.toShortString()).append("\n");
         }
         return str.toString();
     }

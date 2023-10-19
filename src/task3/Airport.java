@@ -15,13 +15,23 @@ package task3;
 public class Airport implements HasId {
     private final static IdGenerator idGenerator = new IdGenerator();
     private final Long id;
+    private String strCode;
     private Location location;
     private FlightSchedule flightSchedule;
 
-    public Airport(final Location location) {
+    public Airport(final String strCode, final Location location) {
         this.id = idGenerator.createId();
         this.location = location;
         this.flightSchedule = new FlightSchedule();
+        this.strCode = strCode;
+    }
+
+    public String getStrCode() {
+        return strCode;
+    }
+
+    public void setStrCode(final String strCode) {
+        this.strCode = strCode;
     }
 
     public void setFlightSchedule(final FlightSchedule flightSchedule) {
@@ -58,11 +68,12 @@ public class Airport implements HasId {
     public String schedule() {
         return flightSchedule.toString();
     }
-
+    public String toShortString() {
+        return location.getCity();
+    }
     @Override
     public String toString() {
-        return "Airport" +
-                " id: " + id +
-                "\n location: " + location.toString();
+        return "id: "+ id +" " +location.toString()+
+                " (" + strCode +") ";
     }
 }

@@ -1,5 +1,7 @@
 package task3;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.NoSuchElementException;
@@ -30,18 +32,21 @@ public class Ticket implements HasId {
             throw new NullPointerException("Error. Try get ZonedDateTime of null flight from ticket");
         return flight.getDepartureTime();
     }
-    public void flightCancel(){
+
+    public void flightCancel() {
         passenger.notifyIfCancelFlight(this);
         price = 0;
         handLuggage.cancel();
     }
-    public void flightCancel(final double returnPercentageIfFlightCanceled){
+
+    public void flightCancel(final double returnPercentageIfFlightCanceled) {
         double returnPrice = this.price * returnPercentageIfFlightCanceled;
-        returnPrice+=  handLuggage.cancel();
+        returnPrice += handLuggage.cancel();
         passenger.notifyIfCancelFlight(this, returnPrice);
-        this.price -= returnPrice ;
+        this.price -= returnPrice;
     }
-    public double cancel(){
+
+    public double cancel() {
         return cancel(flight.getAirCompany().getFlightPrices().getReturnPercentageInLess30Day(),
                 flight.getAirCompany().getFlightPrices().getReturnPercentageInLess10Day(),
                 flight.getAirCompany().getFlightPrices().getReturnPercentageInLess3Day(),
@@ -75,27 +80,33 @@ public class Ticket implements HasId {
         this.price = startPrice * (1 - returnPercentageInLess3Day);
         return startPrice * returnPercentageInLess3Day;
     }
+
     public double calculatePrice() {
         return calculatePrice(this);
     }
 
     public static double calculatePrice(final Ticket ticket) {
-        final FlightPrices flightPrices= ticket.getFlight().getAirCompany().getFlightPrices();
+        final FlightPrices flightPrices = ticket.getFlight().getAirCompany().getFlightPrices();
         return calculatePrice(ticket.getTicketClass(), flightPrices.getBaseEconomyCost(), flightPrices.getBaseFirstCost(), flightPrices.getBaseBusinessCost(), ticket.getFlight().getCountOfSeats(), ticket.getFlight().getCountOfCanceled(), flightPrices.getAllowCancelPercentage(), ticket.getFlight().getCountOfLeftTickets(), flightPrices.getPercentageMarkupForLastTicket(), flightPrices.getPercentageDiscountIfAllCancel(), (int) ticket.getFlight().getDistance(), flightPrices.getPricePerKm(), ticket.getPassenger().getFlownKilometers(), flightPrices.getCoefficientOfFlownKilometers());
     }
 
-    public static double calculatePrice(final Ticket ticket, final Flight flight, final FlownKilometers flownKilometers, final FlightPrices flightPrices ) {
-        return calculatePrice(ticket.getTicketClass(),flightPrices.getBaseEconomyCost(), flightPrices.getBaseFirstCost(), flightPrices.getBaseBusinessCost(), flight.getCountOfSeats(), flight.getCountOfCanceled(), flightPrices.getAllowCancelPercentage(), flight.getCountOfLeftTickets(), flightPrices.getPercentageMarkupForLastTicket(), flightPrices.getPercentageDiscountIfAllCancel(), (int) flight.getDistance(), flightPrices.getPricePerKm(), flownKilometers, flightPrices.getCoefficientOfFlownKilometers());
+    public static double calculatePrice(final Ticket ticket, final Flight flight, final FlownKilometers flownKilometers, final FlightPrices flightPrices) {
+        return calculatePrice(ticket.getTicketClass(), flightPrices.getBaseEconomyCost(), flightPrices.getBaseFirstCost(), flightPrices.getBaseBusinessCost(), flight.getCountOfSeats(), flight.getCountOfCanceled(), flightPrices.getAllowCancelPercentage(), flight.getCountOfLeftTickets(), flightPrices.getPercentageMarkupForLastTicket(), flightPrices.getPercentageDiscountIfAllCancel(), (int) flight.getDistance(), flightPrices.getPricePerKm(), flownKilometers, flightPrices.getCoefficientOfFlownKilometers());
     }
-    public static double calculatePrice(final TicketClass ticketClass, final Flight flight, final FlightPrices flightPrices ) {
-        return calculatePrice(ticketClass,flightPrices.getBaseEconomyCost(), flightPrices.getBaseFirstCost(), flightPrices.getBaseBusinessCost(), flight.getCountOfSeats(), flight.getCountOfCanceled(), flightPrices.getAllowCancelPercentage(), flight.getCountOfLeftTickets(), flightPrices.getPercentageMarkupForLastTicket(), flightPrices.getPercentageDiscountIfAllCancel(), (int) flight.getDistance(), flightPrices.getPricePerKm(), new FlownKilometers(0), flightPrices.getCoefficientOfFlownKilometers());
+
+    public static double calculatePrice(final TicketClass ticketClass, final Flight flight, final FlightPrices flightPrices) {
+        return calculatePrice(ticketClass, flightPrices.getBaseEconomyCost(), flightPrices.getBaseFirstCost(), flightPrices.getBaseBusinessCost(), flight.getCountOfSeats(), flight.getCountOfCanceled(), flightPrices.getAllowCancelPercentage(), flight.getCountOfLeftTickets(), flightPrices.getPercentageMarkupForLastTicket(), flightPrices.getPercentageDiscountIfAllCancel(), (int) flight.getDistance(), flightPrices.getPricePerKm(), new FlownKilometers(0), flightPrices.getCoefficientOfFlownKilometers());
     }
+
     public static double calculatePrice(final TicketClass ticketClass, final double baseEconomyCost, final double baseFirstCost, final double baseBusinessCost, final int countOfTickets, final int countOfCanceledTickets, final double allowCancelPercentage, final int countOfLeftTickets, final double percentageMarkupForLastTicket, final double percentageDiscountIfAllCancel, final int countOfKilometers, final double pricePerKm, final FlownKilometers flownKilometers, final double coefficientOfFlownKilometers) {
         double price = 0;
-        if (flownKilometers.getValue() * coefficientOfFlownKilometers < countOfKilometers)
-            price += (countOfKilometers - flownKilometers.getValue() * coefficientOfFlownKilometers) * pricePerKm;
-        else {
-            flownKilometers.setValue((int) (flownKilometers.getValue() - countOfKilometers / coefficientOfFlownKilometers));
+        if (flownKilometers.getValue() > 0) {
+            if (flownKilometers.getValue() * coefficientOfFlownKilometers < countOfKilometers) {
+                price += (countOfKilometers - flownKilometers.getValue() * coefficientOfFlownKilometers) * pricePerKm;
+            }
+            else {
+                flownKilometers.setValue((int) (flownKilometers.getValue() - countOfKilometers / coefficientOfFlownKilometers));
+            }
         }
         //base price by class
         switch (ticketClass) {
@@ -106,12 +117,16 @@ public class Ticket implements HasId {
         }
         //the fewer tickets, the higher the price only if not many cancels
         if ((double) countOfCanceledTickets / countOfTickets < allowCancelPercentage && countOfLeftTickets < countOfTickets) {
-            price *= (1.00 - (double) countOfLeftTickets / countOfTickets) * percentageMarkupForLastTicket;
+            price *= ((1.00 - (double) countOfLeftTickets / countOfTickets) * percentageMarkupForLastTicket)+1;
         }
         //the more canceled tickets, the bigger the discount
-        if (countOfCanceledTickets > 0 && countOfCanceledTickets < countOfTickets)
+        if (countOfCanceledTickets > 0 && countOfCanceledTickets < countOfTickets) {
             price /= (1.00 - (double) countOfCanceledTickets / countOfTickets) * percentageDiscountIfAllCancel;
-        return price;
+        }
+//        BigDecimal bd = new BigDecimal(price);
+//        bd = bd.setScale(2, RoundingMode.HALF_UP);
+//        return bd.doubleValue();
+        return (int) price;
     }
 
     public TicketClass getTicketClass() {
@@ -121,6 +136,7 @@ public class Ticket implements HasId {
     public void setTicketClass(final TicketClass ticketClass) {
         this.ticketClass = ticketClass;
     }
+
     public double getPrice() {
         return price;
     }

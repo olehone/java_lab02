@@ -1,7 +1,7 @@
 package task3;
 
-public class HandLuggage {
-    private static IdGenerator idGenerator;
+public class HandLuggage implements HasId{
+    private static final IdGenerator idGenerator = new IdGenerator();
     private final Long id;
     private Ticket ticket;
     private double weight;

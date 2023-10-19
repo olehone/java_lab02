@@ -6,6 +6,7 @@ public class AirCompany implements HasId {
     private String name;
     private FlightPrices flightPrices;
     private LuggageRules luggageRules;
+
     public AirCompany(final String name, final FlightPrices flightPrices, final LuggageRules luggageRules) {
         this.id = idGenerator.createId();
         this.name = name;
@@ -40,12 +41,12 @@ public class AirCompany implements HasId {
     public void setLuggageRules(final LuggageRules luggageRules) {
         this.luggageRules = luggageRules;
     }
-
+    public String toShortString(){
+        return name;
+    }
     @Override
     public String toString() {
-        return "AirCompany " +
-                "id: " + id +
-                ", " + name ;
+        return "id: " + id +" "+name ;
     }
 }
 

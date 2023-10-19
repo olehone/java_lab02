@@ -45,6 +45,7 @@ public class Aircraft implements HasId {
     public String getModel() {
         return model;
     }
+
     public void setModel(final String model) {
         this.model = model;
     }
@@ -73,10 +74,12 @@ public class Aircraft implements HasId {
         this.businessSeat = businessSeat;
     }
 
+    public String toShortString() {
+        return manufacturer + " " + model;
+    }
+
     @Override
     public String toString() {
-        return "Aircraft" +
-                " id: " + id +
-                ", " + manufacturer +" " + model;
+        return "id: " + id + " " + manufacturer + " " + model;
     }
 }

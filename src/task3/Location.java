@@ -6,11 +6,11 @@ import java.time.ZonedDateTime;
 
 //TODO: add weather
 public class Location {
-    private final String country;
-    private final String city;
+    private String country;
+    private String city;
     private String address;
-    private final double latitude;
-    private final double longitude;
+    private double latitude;
+    private double longitude;
     private ZoneId zoneId;
     public Location(final String address, final String country, final String city, final double latitude, final double longitude, final ZoneId zoneId) {
         this.address = address;
@@ -27,6 +27,22 @@ public class Location {
         this.latitude = latitude;
         this.longitude = longitude;
         this.zoneId = ZoneOffset.of(utsOffset);
+    }
+
+    public void setCountry(final String country) {
+        this.country = country;
+    }
+
+    public void setCity(final String city) {
+        this.city = city;
+    }
+
+    public void setLatitude(final double latitude) {
+        this.latitude = latitude;
+    }
+
+    public void setLongitude(final double longitude) {
+        this.longitude = longitude;
     }
 
     public void setAddress(final String address) {

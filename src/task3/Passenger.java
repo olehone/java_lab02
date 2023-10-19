@@ -37,11 +37,13 @@ public class Passenger implements HasId {
         return tickets.removeIf(ticket ->
                 (ChronoUnit.MONTHS.between(currentTime, ticket.getDepartureTime())>howLongSaveTickets));
     }
-    public void deleteTickets()
+    public void deleteTickets(final Passenger defaultPassenger)
     {
-        for(final Ticket ticket: tickets){
-            ticket.setPassenger(null);
+        for(final Ticket ticket:tickets)
+        {
+            ticket.setPassenger(defaultPassenger);
         }
+        tickets.clear();
     }
     public void addTicket(final Ticket ticket){
         tickets.add(ticket);
@@ -109,8 +111,6 @@ public class Passenger implements HasId {
     }
     @Override
     public String toString() {
-        return "Passenger" +
-                "\n id: " + this.id +
-                "\n initials:  " + lastName +" " + firstName;
+        return "id: " + this.id +" "+lastName +" " + firstName;
     }
 }

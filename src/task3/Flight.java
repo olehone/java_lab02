@@ -1,6 +1,7 @@
 package task3;
 
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -141,13 +142,14 @@ public class Flight implements HasId {
     }
 
     public boolean addPassenger(final TicketClass ticketClass, final Passenger passenger) {
-        if(!canAddPassenger(ticketClass,passenger))
+        if (!canAddPassenger(ticketClass, passenger))
             return false;
         final Ticket newTicket = new Ticket(passenger, ticketClass, this);
         passenger.addTicket(newTicket);
         this.addTicket(newTicket);
         return true;
     }
+
     //only if one passenger can have one seat
     public boolean canAddPassenger(final TicketClass ticketClass, final Passenger passenger) {
         if (getCountOfLeftTicketsByClass(ticketClass) <= 0)
@@ -159,27 +161,38 @@ public class Flight implements HasId {
         return true;
     }
 
-    public String getFlightInfoToString() {
+    public String getSeatsInfo() {
         final int leftEcoTickets = getCountOfLeftTicketsByClass(TicketClass.Economy);
         final int leftFirstTickets = getCountOfLeftTicketsByClass(TicketClass.First);
         final int leftBusinessTickets = getCountOfLeftTicketsByClass(TicketClass.Business);
-        final int ecoSeats = aircraft.getEconomySeat();
-        final int firstSeats = aircraft.getFirstSeat();
-        final int businessSeats = aircraft.getBusinessSeat();
-        return this.toString() +
-                "\n" +
-                "\n Class | Free | Occupied | Total | Base price |" +
-                "\n   Eco |   " + leftEcoTickets + " |       " + (ecoSeats - leftEcoTickets) + " |    " + ecoSeats + " | " + Ticket.calculatePrice(TicketClass.Economy, this, airCompany.getFlightPrices()) + " |" +
-                "\n First |   " + leftFirstTickets + " |       " + (firstSeats - leftFirstTickets) + " |    " + firstSeats + " |" + Ticket.calculatePrice(TicketClass.First, this, airCompany.getFlightPrices()) + " |" +
-                "\n  Buss |   " + leftBusinessTickets + " |       " + (businessSeats - leftBusinessTickets) + " |    " + businessSeats + " |" + Ticket.calculatePrice(TicketClass.Business, this, airCompany.getFlightPrices()) + " |\n" +
-                "\n Total |   " + getCountOfLeftTickets() + " |       " + (ecoSeats - leftEcoTickets + firstSeats - leftFirstTickets + businessSeats - leftBusinessTickets) + " |    " + (ecoSeats + firstSeats + businessSeats) + " |\n";
+
+        final String format = "%-8s| %5s| %9s| %6s| %12s| %9s |\n";
+        final String header = String.format(format, "Class", "Free", "Occupied", "Total", "Price", "Profit");
+        final String divider = "-----------------------------------------------------------\n";
+        final String ecoRow = String.format(format, "Economy", leftEcoTickets, (economySeat - leftEcoTickets), economySeat, Ticket.calculatePrice(TicketClass.Economy, this, airCompany.getFlightPrices()), calculateProfitByClass(TicketClass.Economy));
+        final String firstRow = String.format(format, "First", leftFirstTickets, (firstSeat - leftFirstTickets), firstSeat, Ticket.calculatePrice(TicketClass.First, this, airCompany.getFlightPrices()), calculateProfitByClass(TicketClass.First));
+        final String businessRow = String.format(format, "Business", leftBusinessTickets, (businessSeat - leftBusinessTickets), businessSeat, Ticket.calculatePrice(TicketClass.Business, this, airCompany.getFlightPrices()), calculateProfitByClass(TicketClass.Business));
+        final String totalRow = String.format(format, "Total", getCountOfLeftTickets(), (economySeat - leftEcoTickets + firstSeat - leftFirstTickets + businessSeat - leftBusinessTickets), (economySeat + firstSeat + businessSeat), "", calculateProfit());
+
+        return header + divider + ecoRow + firstRow + businessRow + divider + totalRow;
     }
-    public double calculateProfit(){
+
+
+    public double calculateProfit() {
         double profit = 0;
-        for (final Ticket ticket: tickets){
+        for (final Ticket ticket : tickets) {
             profit += ticket.getFullPrice();
         }
-        return profit;
+        return (int) profit;
+    }
+
+    public double calculateProfitByClass(final TicketClass ticketClass) {
+        double profit = 0;
+        for (final Ticket ticket : tickets) {
+            if (ticket.getTicketClass() == ticketClass)
+                profit += ticket.getFullPrice();
+        }
+        return (int) profit;
     }
 
     public void cancel() {
@@ -201,7 +214,7 @@ public class Flight implements HasId {
     }
 
     public int getCountOfSeats() {
-        return economySeat+ firstSeat +businessSeat;
+        return economySeat + firstSeat + businessSeat;
     }
 
     public int getCountOfSeatsByClass(final TicketClass ticketClass) {
@@ -266,16 +279,40 @@ public class Flight implements HasId {
     public void setAirCompany(final AirCompany airCompany) {
         this.airCompany = airCompany;
     }
+
+    public String toShortString() {
+        String str = "";
+        if (isCanceled) {
+            str += "CANCELED ";
+        }
+        str += id +
+                " " + departureTime.format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")) +
+                " " + departureAirport.toShortString() +
+                "-" + arrivalAirport.toShortString() +
+                " " + arrivalTime.format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")) +
+                " " + airCompany.toShortString() +
+                " " + aircraft.toShortString();
+
+        return str;
+    }
+
     @Override
     public String toString() {
-        return "Flight" +
-                " id: " + id +
-                "\n departure time: " + departureTime.toString() +
-                "\n arrival time: " + arrivalTime.toString() +
-                "\n departure airport: " + departureAirport.toString() +
-                "\n arrival airport: " + arrivalAirport.toString() +
-                "\n aircraft: " + aircraft.toString() +
-                "\n is canceled: " + isCanceled +
-                "\n air company: " + airCompany.toString();
+        String str = "";
+        if (isCanceled) {
+            str += "CANCELED ";
+        }
+        str += "flight id: " + id +
+                "\n Air company " + airCompany.toString() +
+                "\n Aircraft " + aircraft.toString() +
+                "\n\n DEPARTURE  " +
+                "\n Airport: " + departureAirport.toString() +
+                "\n Time: " + departureTime.format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")) +
+                "\n\n ARRIVAL " +
+                "\n Airport: " + arrivalAirport.toString() +
+                "\n Time: " + arrivalTime.format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm"))+
+                "\n \n"+ getSeatsInfo();
+
+        return str;
     }
 }
