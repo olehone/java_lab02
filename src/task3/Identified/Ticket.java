@@ -1,29 +1,27 @@
 package task3.Identified;
 
-import task3.Calculations;
 import task3.IdGenerator;
-import task3.Interfaces.HasId;
-import task3.Data.TicketClass;
+import task3.Data.TicketType;
+import task3.IdService;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
-public class Ticket implements HasId {
-    private static final IdGenerator idGenerator = new IdGenerator();
+public class Ticket{
     private final Long id;
     private HandLuggage handLuggage;
     private Passenger passenger;
     private double price;
     private boolean isCanceled;
-    private TicketClass ticketClass;
+    private TicketType ticketType;
     private Flight flight;
 
 
-    public Ticket(final Passenger passenger, final TicketClass ticketClass, final Flight flight) {
-        this.id = idGenerator.createId();
+    public Ticket(final Passenger passenger, final TicketType ticketType, final Flight flight) {
+        this.id = IdService.createId();
         this.passenger = passenger;
         this.flight = flight;
-        this.ticketClass = ticketClass;
+        this.ticketType = ticketType;
         this.isCanceled = false;
         this.handLuggage = new HandLuggage(this);
         this.price = calculatePrice();
@@ -85,17 +83,17 @@ public class Ticket implements HasId {
     }
 
     public double calculatePrice() {
-        return Calculations.calculatePrice(this);
+        return flight.calculatePrice(ticketType);
     }
 
 
 
-    public TicketClass getTicketClass() {
-        return ticketClass;
+    public TicketType getTicketClass() {
+        return ticketType;
     }
 
-    public void setTicketClass(final TicketClass ticketClass) {
-        this.ticketClass = ticketClass;
+    public void setTicketClass(final TicketType ticketType) {
+        this.ticketType = ticketType;
     }
 
     public double getPrice() {
@@ -139,7 +137,7 @@ public class Ticket implements HasId {
     }
 
     public String getClassToString() {
-        switch (ticketClass) {
+        switch (ticketType) {
             case Economy -> {
                 return "economy class";
             }

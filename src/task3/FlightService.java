@@ -1,7 +1,7 @@
 package task3;
 
 import task3.Data.Location;
-import task3.Data.TicketClass;
+import task3.Data.TicketType;
 import task3.Identified.*;
 import task3.Rules.FlightRules;
 import task3.Rules.LuggageRules;
@@ -9,138 +9,36 @@ import task3.Rules.LuggageRules;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-//Створіть систему управління польотами авіакомпанії. Пропоновані
-//класи для ієрархії: літак, аеропорт, пасажир, рейс, розклад польотів,
-//квиток.
-//Функціональні вимоги:
-//1. Створення, видалення, редагування літака
-//2. Створення, видалення, редагування рейсу
-//3. Створення, видалення, редагування пасажирів
-//4. Створення, видалення, редагування айропорта
-//5. Відображення розкладів польотів
-//6. Створення розкладу польотів
-//7. Продаж, скасування квитків
-//8. Розрахунок доходів за заданий період часу
-public class FlightService {
+import java.util.*;
+import java.util.stream.Collectors;
+public class FlightService implements FlightStrategy{
     final private List<Passenger> passengers;
     final private List<Aircraft> aircrafts;
     final private List<AirCompany> airCompanies;
     final private List<Airport> airports;
     final private List<Flight> flights;
-    final private Location defaultLocation;
-    final private Passenger defaultPassenger;
-    final private Aircraft defaultAircraft;
-    final private AirCompany defaultAirCompany;
-    final private Airport defaultAirport;
-    final private Flight defaultFlight;
-    final private FlightRules defaultFlightRules;
-    final private LuggageRules defaultLuggageRules;
-    final private ZonedDateTime defaultTime;
+    final private DefaultValuesService defaultValuesService;
 
-
-    //make Lists with firsts defaults object for deleting
+    //make Lists and defaults object for deleting
     public FlightService() {
         this.passengers = new LinkedList<>();
         this.aircrafts = new LinkedList<>();
         this.airports = new LinkedList<>();
         this.airCompanies = new LinkedList<>();
         this.flights = new LinkedList<>();
-
-        //if remove any object, references go to default objects
-        this.defaultTime = ZonedDateTime.now();
-        this.defaultFlightRules = new FlightRules(0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.);
-        this.defaultLuggageRules = new LuggageRules(0., 0., 0., 0., 0., 0.0);
-        this.defaultLocation = new Location("REMOVED", "LOCATION", "REMOVED", 0., 0., "+0");
-        this.defaultPassenger = new Passenger("REMOVED", "PASSENGER", false, 0);
-        this.defaultAircraft = new Aircraft("REMOVED", "AIRCRAFT", 1, 0, 0);
-        this.defaultAirCompany = new AirCompany("REMOVED", defaultFlightRules, defaultLuggageRules);
-        this.defaultAirport = new Airport("REMOVED", defaultLocation);
-        this.defaultFlight = new Flight(defaultTime, defaultTime, defaultAirport, defaultAirport, defaultAircraft, defaultAirCompany);
-        this.defaultFlight.cancel();
+        this.defaultValuesService = new DefaultValuesService();
     }
 
-    public double getProfitByCompany(final AirCompany airCompany) {
-        double profit = 0;
-        final List<Flight> companyFlights = flights.stream().filter(flight -> flight.getAirCompany() == airCompany).toList();
-        for (final Flight flight : companyFlights) {
-            profit += flight.calculateProfit();
-        }
-        return (int) profit;
-    }
-
-    public double getProfitByTimeAndCompany(final AirCompany airCompany, final ZonedDateTime startTime, final ZonedDateTime finalTime) {
-        double profit = 0;
-        List<Flight> companyFlights = flights.stream().filter(flight -> flight.getAirCompany() == airCompany).toList();
-        companyFlights = companyFlights.stream().filter(flight -> startTime.isBefore(flight.getDepartureTime())).toList();
-        companyFlights = companyFlights.stream().filter(flight -> finalTime.isAfter(flight.getDepartureTime())).toList();
-        for (final Flight flight : companyFlights) {
-            profit += flight.calculateProfit();
-        }
-        return (int) profit;
-    }
-
-    public double getProfitByTime(final ZonedDateTime startTime, final ZonedDateTime finalTime) {
-        double profit = 0;
-        List<Flight> companyFlights = flights.stream().filter(flight -> startTime.isBefore(flight.getDepartureTime())).toList();
-        companyFlights = companyFlights.stream().filter(flight -> finalTime.isAfter(flight.getDepartureTime())).toList();
-        for (final Flight flight : companyFlights) {
-            profit += flight.calculateProfit();
-        }
-        return (int) profit;
-    }
-
-    public String getFlightInfoById(final Long flightId) {
-        final Flight flight = getFlightById(flightId);
-        return getFlightInfo(flight);
-    }
-
-    public String getFlightInfo(final Flight flight) {
-        if (flight == null)
-            return "No info";
-        return flight.toString();
-    }
-    public boolean cancelTicket(final Long ticketId) {
-        final Ticket ticket = getTicketById(ticketId);
-        if(ticket==null)
-            return false;
-        ticket.cancel();
-        return true;
-    }
-    public boolean cancelTicket(final Long passengerId, final Long flightId) {
-        final Ticket ticket = getTicketByFlightAndPassengerId(passengerId, flightId);
-        if(ticket==null)
-            return false;
-        ticket.cancel();
-        return true;
-    }
-    public Ticket getTicketById(final Long ticketId) {
-        return flights.stream()
-                .flatMap(flight -> flight.getTickets().stream())
-                .filter(ticket -> ticketId.equals(ticket.getId()))
-                .findFirst()
-                .orElse(null);
-    }
-    public Ticket getTicketByFlightAndPassengerId(final Long passengerId, final Long flightId) {
-        final Passenger passenger = getPassengerById(passengerId);
-        if(passenger==null||passenger.getTickets().size()<1)
-            return null;
-        return passenger.getTickets().stream()
-                .filter(ticket -> flightId.equals(ticket.getFlight().getId()))
-                .findFirst().orElse(null);
-    }
-    public Long sellTicket(final Long flightId, final Long passengerId, final TicketClass ticketClass) {
+    public Long sellTicket(final Long flightId, final Long passengerId, final TicketType ticketType) {
         final Flight flight = getFlightById(flightId);
         final Passenger passenger = getPassengerById(passengerId);
-        return sellTicket(flight, passenger, ticketClass);
+        return sellTicket(flight, passenger, ticketType);
     }
 
-    private Long sellTicket(final Flight flight, final Passenger passenger, final TicketClass ticketClass) {
-        if (flight == null || ticketClass == null || flight.getCountOfLeftTicketsByClass(ticketClass) <= 0 || passenger == null)
+    private Long sellTicket(final Flight flight, final Passenger passenger, final TicketType ticketType) {
+        if (flight == null || ticketType == null || flight.getCountOfLeftTicketsByClass(ticketType) <= 0 || passenger == null)
             return null;
-        final Ticket newTicket = new Ticket(passenger, ticketClass, flight);
+        final Ticket newTicket = new Ticket(passenger, ticketType, flight);
         flight.addTicket(newTicket);
         passenger.addTicket(newTicket);
         return newTicket.getId();
@@ -175,15 +73,15 @@ public class FlightService {
         return newAircraft.getId();
     }
 
-    public Long addAirport(final String strCode, final String address, final String country, final String city, final double latitude, final double longitude, final ZoneId zoneId) {
-        final Location newLocation = new Location(address, country, city, latitude, longitude, zoneId);
+    public Long addAirport(final String strCode, final String country, final String city, final double latitude, final double longitude, final ZoneId zoneId) {
+        final Location newLocation = new Location(country, city, latitude, longitude, zoneId);
         final Airport newAirport = new Airport(strCode, newLocation);
         airports.add(newAirport);
         return newAirport.getId();
     }
 
-    public Long addAirport(final String strCode, final String address, final String country, final String city, final double latitude, final double longitude, final String utsOffset) {
-        final Location newLocation = new Location(address, country, city, latitude, longitude, utsOffset);
+    public Long addAirport(final String strCode, final String country, final String city, final double latitude, final double longitude, final String utsOffset) {
+        final Location newLocation = new Location(country, city, latitude, longitude, utsOffset);
         final Airport newAirport = new Airport(strCode, newLocation);
         airports.add(newAirport);
         return newAirport.getId();
@@ -224,6 +122,21 @@ public class FlightService {
         if (isBonusEnable != null)
             passenger.setBonusEnable(isBonusEnable);
         return true;
+    }
+
+    public String getSchedules() {
+        return airports.stream().map(Airport::scheduleToString).collect(Collectors.joining("\n"));
+    }
+
+    public FlightSchedule createSchedule(final List<Flight> flights) {
+        return new FlightSchedule(flights);
+    }
+    public FlightSchedule createSchedule(final Long... flightIds) {
+        return createSchedule(Arrays.stream(flightIds)
+                        .map(this::getFlightById)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList())
+        );
     }
 
     public boolean changeFlight(final Long flightId, final ZonedDateTime departureTime, final ZonedDateTime arrivalTime, final Long departureAirportId, final Long arrivalAirportId, final Long aircraftId, final Long airCompanyId) {
@@ -292,21 +205,14 @@ public class FlightService {
         return true;
     }
 
-    public boolean changeAirport(final Long airportId, final String address, final String country, final String city, final Double latitude, final Double longitude, final String utsOffset) {
-        return changeAirport(airportId, address, country, city, latitude, longitude, ZoneOffset.of(utsOffset));
+    public boolean changeAirport(final Long airportId, final String country, final String city, final Double latitude, final Double longitude, final String utsOffset) {
+        return changeAirport(airportId, country, city, latitude, longitude, ZoneOffset.of(utsOffset));
     }
 
-    public boolean changeAirport(final Long airportId, final String address, final String country, final String city, final Double latitude, final Double longitude, final ZoneId zoneId) {
-        return changeAirport(getAirportById(airportId), address, country, city, latitude, longitude, zoneId);
-
-    }
-
-    private boolean changeAirport(final Airport airport, final String address, final String country, final String city, final Double latitude, final Double longitude, final ZoneId zoneId) {
+    private boolean changeAirport(final Airport airport, final String country, final String city, final Double latitude, final Double longitude, final ZoneId zoneId) {
         if (airport == null)
             return false;
         final Location location = airport.getLocation();
-        if (address != null)
-            location.setAddress(address);
         if (country != null)
             location.setCountry(country);
         if (city != null)
@@ -320,13 +226,104 @@ public class FlightService {
         return true;
     }
 
+    public boolean changeAirport(final Long airportId, final String country, final String city, final Double latitude, final Double longitude, final ZoneId zoneId) {
+        return changeAirport(getAirportById(airportId), country, city, latitude, longitude, zoneId);
+
+    }
+
+    private double getProfitByCompany(final AirCompany airCompany) {
+        if (airCompany == null)
+            return 0;
+        double profit = 0;
+        final List<Flight> companyFlights = flights.stream().filter(flight -> flight.getAirCompany() == airCompany).toList();
+        for (final Flight flight : companyFlights) {
+            profit += flight.calculateProfit();
+        }
+        return (int) profit;
+    }
+
+    public double getProfitByCompanyId(final Long airCompanyId) {
+        final AirCompany airCompany = getAirCompanyById(airCompanyId);
+        return getProfitByCompany(airCompany);
+    }
+
+    public double getProfitByTimeAndCompanyId(final Long airCompanyId, final ZonedDateTime startTime, final ZonedDateTime finalTime) {
+        final AirCompany airCompany = getAirCompanyById(airCompanyId);
+        return getProfitByTimeAndCompany(airCompany, startTime, finalTime);
+    }
+
+    private double getProfitByTimeAndCompany(final AirCompany airCompany, final ZonedDateTime startTime, final ZonedDateTime finalTime) {
+        double profit = 0;
+        List<Flight> companyFlights = flights.stream().filter(flight -> flight.getAirCompany() == airCompany).toList();
+        companyFlights = companyFlights.stream().filter(flight -> startTime.isBefore(flight.getDepartureTime())).toList();
+        companyFlights = companyFlights.stream().filter(flight -> finalTime.isAfter(flight.getDepartureTime())).toList();
+        for (final Flight flight : companyFlights) {
+            profit += flight.calculateProfit();
+        }
+        return (int) profit;
+    }
+
+    public double getProfitByTime(final ZonedDateTime startTime, final ZonedDateTime finalTime) {
+        double profit = 0;
+        List<Flight> companyFlights = flights.stream().filter(flight -> startTime.isBefore(flight.getDepartureTime())).toList();
+        companyFlights = companyFlights.stream().filter(flight -> finalTime.isAfter(flight.getDepartureTime())).toList();
+        for (final Flight flight : companyFlights) {
+            profit += flight.calculateProfit();
+        }
+        return (int) profit;
+    }
+
+    public String getFlightInfoById(final Long flightId) {
+        final Flight flight = getFlightById(flightId);
+        return getFlightInfo(flight);
+    }
+
+    public String getFlightInfo(final Flight flight) {
+        if (flight == null)
+            return "No info";
+        return flight.toString();
+    }
+
+    public boolean cancelTicket(final Long ticketId) {
+        final Ticket ticket = getTicketById(ticketId);
+        if (ticket == null)
+            return false;
+        ticket.cancel();
+        return true;
+    }
+
+    public boolean cancelTicket(final Long passengerId, final Long flightId) {
+        final Ticket ticket = getTicketByFlightAndPassengerId(passengerId, flightId);
+        if (ticket == null)
+            return false;
+        ticket.cancel();
+        return true;
+    }
+
+    public Ticket getTicketById(final Long ticketId) {
+        return flights.stream()
+                .flatMap(flight -> flight.getTickets().stream())
+                .filter(ticket -> ticketId.equals(ticket.getId()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Ticket getTicketByFlightAndPassengerId(final Long passengerId, final Long flightId) {
+        final Passenger passenger = getPassengerById(passengerId);
+        if (passenger == null || passenger.getTickets().isEmpty())
+            return null;
+        return passenger.getTickets().stream()
+                .filter(ticket -> flightId.equals(ticket.getFlight().getId()))
+                .findFirst().orElse(null);
+    }
+
     public boolean deletePassenger(final Long passengerId) {
         Passenger passenger = getPassengerById(passengerId);
         if (passenger == null)
             return false;
-        passenger.deleteTickets(defaultPassenger);
+        passenger.deleteTickets(defaultValuesService.getDefaultPassenger());
         passengers.remove(passenger);
-        passenger = defaultPassenger;
+        passenger = defaultValuesService.getDefaultPassenger();
         return true;
     }
 
@@ -339,13 +336,9 @@ public class FlightService {
 
     public String getTicketsByFlightIdToString(final Long flightId) {
         final List<Ticket> tickets = getTicketsByFlightId(flightId);
-        if (tickets == null || tickets.size() == 0)
+        if (tickets == null || tickets.isEmpty())
             return "";
-        final StringBuilder string = new StringBuilder();
-        for (final Ticket ticket : tickets) {
-            string.append(ticket.toString()).append("\n");
-        }
-        return string.toString();
+        return tickets.stream().map(Ticket::toString).collect(Collectors.joining("\n"));
     }
 
     public boolean deleteAircraft(final Long aircraftId) {
@@ -353,7 +346,7 @@ public class FlightService {
         if (aircraft == null)
             return false;
         aircrafts.remove(aircraft);
-        aircraft = defaultAircraft;
+        aircraft = defaultValuesService.getDefaultAircraft();
         return true;
     }
 
@@ -363,9 +356,9 @@ public class FlightService {
         if (airport == null)
             return false;
         flights.stream().filter(flight -> flight.getArrivalAirport() == airport)
-                .forEach(flight -> flight.setArrivalAirport(defaultAirport));
+                .forEach(flight -> flight.setArrivalAirport(defaultValuesService.getDefaultAirport()));
         flights.stream().filter(flight -> flight.getDepartureAirport() == airport)
-                .forEach(flight -> flight.setDepartureAirport(defaultAirport));
+                .forEach(flight -> flight.setDepartureAirport(defaultValuesService.getDefaultAirport()));
         return airports.remove(airport);
     }
 
@@ -380,7 +373,7 @@ public class FlightService {
             flight.getArrivalAirport().removeFlight(flight);
         // if someone buy ticket, we can`t just
         // delete flight, cancel them
-        if (flight.getTickets().size() > 0) {
+        if (!flight.getTickets().isEmpty()) {
             flight.cancel();
         } else {
             flights.remove(flight);
@@ -411,21 +404,15 @@ public class FlightService {
     }
 
     public Passenger getPassengerById(final Long passengerId) {
-        if (passengerId == null)
-            return null;
-
         return passengers.stream()
-                .filter(passenger -> passengerId.equals(passenger.getId()))
+                .filter(passenger -> passenger.getId().equals(passengerId))
                 .findFirst()
                 .orElse(null);
     }
 
     public AirCompany getAirCompanyById(final Long airCompanyId) {
-        if (airCompanyId == null)
-            return null;
-
         return airCompanies.stream()
-                .filter(company -> airCompanyId.equals(company.getId()))
+                .filter(company -> company.getId().equals(airCompanyId))
                 .findFirst()
                 .orElse(null);
     }
@@ -464,31 +451,22 @@ public class FlightService {
     }
 
     public Aircraft getAircraftById(final Long aircraftId) {
-        if (aircraftId == null)
-            return null;
-
         return aircrafts.stream()
-                .filter(aircraft -> aircraftId.equals(aircraft.getId()))
+                .filter(aircraft -> aircraft.getId().equals(aircraftId))
                 .findFirst()
                 .orElse(null);
     }
 
     public Airport getAirportById(final Long airportId) {
-        if (airportId == null)
-            return null;
-
         return airports.stream()
-                .filter(airport -> airportId.equals(airport.getId()))
+                .filter(airport -> airport.getId().equals((airportId)))
                 .findFirst()
                 .orElse(null);
     }
 
     public Flight getFlightById(final Long flightId) {
-        if (flightId == null)
-            return null;
-
         return flights.stream()
-                .filter(flight -> flightId.equals(flight.getId()))
+                .filter(flight -> flight.getId().equals((flightId)))
                 .findFirst()
                 .orElse(null);
     }
@@ -498,88 +476,60 @@ public class FlightService {
     }
 
     public String flightsToString(final List<Flight> flights) {
-        if (flights == null || flights.size() < 1)
+        if (flights == null || flights.isEmpty())
             return "Empty flights list";
-        final StringBuilder string = new StringBuilder();
-        for (final Flight flight : flights) {
-            string.append(flight.toString());
-            string.append("\n--------------------\n\n");
-        }
-        return string.substring(0, string.length() - 21);
+        return flights.stream().map(Flight::toString).collect(Collectors.joining("\n--------------------\n"));
     }
 
     public String passengersToString() {
-        final StringBuilder string = new StringBuilder();
-        for (final Passenger passenger : passengers) {
-            string.append(passenger.toString()).append("\n");
-        }
-        return string.toString();
+        return passengers.stream().map(Passenger::toString).collect(Collectors.joining("\n"));
     }
 
     public String aircraftsToString() {
-        final StringBuilder string = new StringBuilder();
-        for (final Aircraft aircraft : aircrafts) {
-            string.append(aircraft.toString()).append("\n");
-        }
-        return string.toString();
+        return aircrafts.stream().map(Aircraft::toString).collect(Collectors.joining("\n"));
     }
 
     public String airportsToString() {
-        final StringBuilder string = new StringBuilder();
-        for (final Airport airport : airports) {
-            string.append(airport.toString());
-            string.append("\n");
-            string.append(airport.schedule());
-            string.append("\n--------------------\n");
-        }
-        return string.toString();
+        return airports.stream().map(Airport::withScheduleToString).collect(Collectors.joining("\n"));
     }
 
     public String airCompaniesToString() {
-        final StringBuilder string = new StringBuilder();
-        for (final AirCompany airCompany : airCompanies) {
-            string.append(airCompany.toString());
-            string.append("\n Profit");
-            string.append("\n Last year: ");
-            string.append(getProfitByTimeAndCompany(airCompany, ZonedDateTime.now().minusMonths(12), ZonedDateTime.now()));
-            string.append("\n Last quarter: ");
-            string.append(getProfitByTimeAndCompany(airCompany, ZonedDateTime.now().minusMonths(3), ZonedDateTime.now()));
-            string.append("\n Total: ");
-            string.append(getProfitByCompany(airCompany));
-            string.append("\n");
-
-        }
-        return string.toString();
+        return airCompanies.stream()
+                .map(airCompany -> airCompany.toString() +
+                        "\n Profit" +
+                        "\n Last year: " + getProfitByTimeAndCompany(airCompany, ZonedDateTime.now().minusMonths(12), ZonedDateTime.now()) +
+                        "\n Last quarter: " + getProfitByTimeAndCompany(airCompany, ZonedDateTime.now().minusMonths(3), ZonedDateTime.now()) +
+                        "\n Total: " + getProfitByCompany(airCompany) +
+                        "\n")
+                .collect(Collectors.joining("\n"));
     }
 
     @Override
     public String toString() {
-        final String strongDivider = "\n********************\n";
-        final String mediumDivider = "\n====================\n";
-        return strongDivider
+        return "\n********************\n"
                 + "Passengers" +
-                mediumDivider +
+                "\n====================\n" +
                 passengersToString() +
-                strongDivider +
+                "\n********************\n" +
 
                 "Airports" +
-                mediumDivider +
+                "\n====================\n" +
                 airportsToString() +
-                strongDivider +
+                "\n********************\n" +
 
                 "Aircrafts" +
-                mediumDivider +
+                "\n====================\n" +
                 aircraftsToString() +
-                strongDivider +
+                "\n********************\n" +
 
                 "Air Companies" +
-                mediumDivider +
+                "\n====================\n" +
                 airCompaniesToString() +
-                strongDivider +
+                "\n********************\n" +
 
                 "Flights" +
-                mediumDivider +
+                "\n====================\n" +
                 flightsToString() +
-                strongDivider;
+                "\n********************\n";
     }
 }

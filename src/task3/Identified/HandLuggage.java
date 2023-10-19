@@ -1,11 +1,10 @@
 package task3.Identified;
 
 import task3.IdGenerator;
-import task3.Interfaces.HasId;
+import task3.IdService;
 import task3.Rules.LuggageRules;
 
-public class HandLuggage implements HasId {
-    private static final IdGenerator idGenerator = new IdGenerator();
+public class HandLuggage{
     private final Long id;
     private Ticket ticket;
     private double weight;
@@ -15,18 +14,18 @@ public class HandLuggage implements HasId {
     private double additionalPrice;
 
     public HandLuggage() {
-        this.id = idGenerator.createId();
+        this.id = IdService.createId();
     }
 
     public HandLuggage(final Ticket ticket) {
-        this.id = idGenerator.createId();
+        this.id = IdService.createId();
         this.ticket = ticket;
         additionalPrice = 0;
     }
 
     public HandLuggage(final double weight, final int length, final int width, final int height, final Ticket ticket, final double maxUnpaidSideLengthInCm, final double maxUnpaidWeightInKg, final double priceForExtraLengthByCm, final double priceForExtraWeightByKg) {
         this.ticket = ticket;
-        this.id = idGenerator.createId();
+        this.id = IdService.createId();
         if (!isAllowed(weight, length, width, height, maxUnpaidWeightInKg, maxUnpaidSideLengthInCm)) {
             this.additionalPrice = 0;
             return;
@@ -40,7 +39,7 @@ public class HandLuggage implements HasId {
 
     public HandLuggage(final double weight, final int length, final int width, final int height, final Ticket ticket, final LuggageRules luggageRules) {
         this.ticket = ticket;
-        this.id = idGenerator.createId();
+        this.id = IdService.createId();
         if (!isAllowed(weight, length, width, height, luggageRules)) {
             this.additionalPrice = 0;
             return;

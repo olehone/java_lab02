@@ -1,11 +1,14 @@
 package task3;
 
 import task3.Identified.Flight;
+
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 //Створіть систему управління польотами авіакомпанії. Пропоновані
 //        класи для ієрархії: літак, аеропорт, пасажир, рейс, розклад польотів,
@@ -36,39 +39,6 @@ public class FlightSchedule {
                 (ChronoUnit.DAYS.between(currentTime, flight.getDepartureTime()) > howManyDaysSaveFlights));
     }
 
-    public List<Flight> getFreshFlights() {
-        return getFreshFlights(3);
-    }
-
-    public List<Flight> getFreshFlights(final int howManyHoursShowFlight) {
-        final ZonedDateTime currentTime = ZonedDateTime.now();
-        return flights.stream()
-                .filter(flight -> flight.getDepartureTime().isAfter(currentTime.minusHours(howManyHoursShowFlight)))
-                .toList();
-    }
-
-    public List<Flight> getFreshDeparturesFlights() {
-        return getFreshDeparturesFlights(3);
-    }
-
-    public List<Flight> getFreshArrivalFlights() {
-        return getFreshArrivalFlights(3);
-    }
-
-    public List<Flight> getFreshDeparturesFlights(final int howManyHoursShowFlight) {
-        return getFreshFlights(howManyHoursShowFlight).stream()
-                .filter(flight -> flight.getDepartureAirport().getFlightSchedule() == this && flight.isNotCanceled())
-                .sorted(Comparator.comparing(Flight::getDepartureTime))
-                .toList();
-    }
-
-    public List<Flight> getFreshArrivalFlights(final int howManyHoursShowFlight) {
-        return getFreshFlights(howManyHoursShowFlight).stream()
-                .filter(flight -> flight.getArrivalAirport().getFlightSchedule() == this && flight.isNotCanceled())
-                .sorted(Comparator.comparing(Flight::getDepartureTime))
-                .toList();
-    }
-
     public List<Flight> getFlights() {
         return flights;
     }
@@ -81,21 +51,38 @@ public class FlightSchedule {
         this.flights.remove(flight);
     }
 
-    @Override
-    public String toString() {
-        return toString(3);
+    public List<Flight> getFreshFlights() {
+        final LocalDate today = LocalDate.now();
+        return flights.stream()
+                .filter(flight -> flight.getDepartureTime().toLocalDate().isEqual(today)
+                        || flight.getDepartureTime().toLocalDate().isAfter(today))
+                .sorted(Comparator.comparing(Flight::getDepartureTime))
+                .toList();
     }
 
-    public String toString(final int howManyHoursShowFlight) {
-        final StringBuilder str = new StringBuilder();
-        str.append("Departures: \n");
-        for (final Flight flight : getFreshDeparturesFlights(howManyHoursShowFlight)) {
-            str.append(flight.toShortString()).append("\n");
-        }
-        str.append("Arrivals: \n");
-        for (final Flight flight : getFreshArrivalFlights(howManyHoursShowFlight)) {
-            str.append(flight.toShortString()).append("\n");
-        }
-        return str.toString();
+    public List<Flight> getFreshDeparturesFlights() {
+        return getFreshFlights().stream()
+                .filter(flight -> flight.getDepartureAirport().getFlightSchedule() == this && flight.isNotCanceled())
+                .toList();
+    }
+
+    public List<Flight> getFreshArrivalFlights() {
+        return getFreshFlights().stream()
+                .filter(flight -> flight.getArrivalAirport().getFlightSchedule() == this && flight.isNotCanceled())
+                .toList();
+    }
+    public String getAllFlightsToString(){
+        return flights.stream().map(Flight::toShortString).collect(Collectors.joining("\n"));
+    }
+    @Override
+    public String toString() {
+        final List<Flight> departuresFlights = getFreshDeparturesFlights();
+        final List<Flight> arrivalFlights = getFreshArrivalFlights();
+        final String departuresString = departuresFlights.stream().map(Flight::toShortString).collect(Collectors.joining("\n"));
+        final String arrivalString = arrivalFlights.stream().map(Flight::toShortString).collect(Collectors.joining("\n"));
+        return "Departures \n" +
+                departuresString +
+                "\nArrivals\n" +
+                arrivalString;
     }
 }

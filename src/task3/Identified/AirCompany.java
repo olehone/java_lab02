@@ -1,19 +1,18 @@
 package task3.Identified;
 
-import task3.Interfaces.HasId;
+import task3.IdService;
 import task3.Rules.FlightRules;
 import task3.IdGenerator;
 import task3.Rules.LuggageRules;
 
-public class AirCompany implements HasId {
-    private final static IdGenerator idGenerator = new IdGenerator();
+public class AirCompany{
     private final Long id;
     private String name;
     private FlightRules flightRules;
     private LuggageRules luggageRules;
 
     public AirCompany(final String name, final FlightRules flightRules, final LuggageRules luggageRules) {
-        this.id = idGenerator.createId();
+        this.id = IdService.createId();
         this.name = name;
         this.flightRules = flightRules;
         this.luggageRules = luggageRules;

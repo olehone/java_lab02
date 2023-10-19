@@ -1,8 +1,7 @@
 package task3.Identified;
 
 import task3.IdGenerator;
-import task3.Data.FlownKilometers;
-import task3.Interfaces.HasId;
+import task3.IdService;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -21,20 +20,23 @@ import java.util.List;
 //        6. Створення розкладу польотів
 //        7. Продаж, скасування квитків
 //        8. Розрахунок доходів за заданий період часу
-public class Passenger implements HasId {
-    private final static IdGenerator idGenerator = new IdGenerator();
+public class Passenger{
     private final Long id;
     private String firstName;
     private String lastName;
     private boolean isBonusEnable;
-    private final FlownKilometers flownKilometers;
     private final List<Ticket> tickets = new LinkedList<Ticket>();
     public Passenger(final String firstName, final String lastName, final boolean isBonusEnable, final int flownKilometers) {
-        this.id = idGenerator.createId();
+        this.id = IdService.createId();
         this.firstName = firstName;
         this.lastName = lastName;
         this.isBonusEnable = isBonusEnable;
-        this.flownKilometers = new FlownKilometers(flownKilometers);
+    }
+    public Passenger(final String firstName, final String lastName, final boolean isBonusEnable) {
+        this.id = IdService.createId();
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.isBonusEnable = isBonusEnable;
     }
     public boolean removeOldTickets(final int howLongSaveTickets){
         final ZonedDateTime currentTime = ZonedDateTime.now();
@@ -52,17 +54,10 @@ public class Passenger implements HasId {
     public void addTicket(final Ticket ticket){
         tickets.add(ticket);
     }
+
     public List<Ticket> getTickets()
     {
         return this.tickets;
-    }
-
-    public Passenger(final String firstName, final String lastName, final boolean isBonusEnable) {
-        this.id = idGenerator.createId();
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.isBonusEnable = isBonusEnable;
-        this.flownKilometers = new FlownKilometers(0);
     }
     public Long getId(){
         return id;
@@ -88,20 +83,6 @@ public class Passenger implements HasId {
 
     public void setBonusEnable(final boolean isBonusEnable) {
         this.isBonusEnable = isBonusEnable;
-    }
-
-    public FlownKilometers getFlownKilometers() {
-        return flownKilometers;
-    }
-    public int getCountOfFlownKilometers() {
-        return flownKilometers.getValue();
-    }
-    public void addKilometers(final int flownKilometers){
-        if(isBonusEnable)
-           this.flownKilometers.addKilometers(flownKilometers);
-    }
-    public void setFlownKilometers(final int flownKilometers) {
-        this.flownKilometers.setValue(flownKilometers);
     }
     public void notifyIfCancelFlight(final Ticket ticket)
     {

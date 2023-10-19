@@ -1,13 +1,13 @@
 package task3.Identified;
 
 import task3.*;
-import task3.Data.TicketClass;
-import task3.Interfaces.HasId;
+import task3.Data.TicketType;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 //Створіть систему управління польотами авіакомпанії. Пропоновані
 //        класи для ієрархії: літак, аеропорт, пасажир, рейс, розклад польотів,
@@ -21,8 +21,7 @@ import java.util.List;
 //        6. Створення розкладу польотів
 //        7. Продаж, скасування квитків
 //        8. Розрахунок доходів за заданий період часу
-public class Flight implements HasId {
-    final private static IdGenerator idGenerator = new IdGenerator();
+public class Flight{
     private final Long id;
     private ZonedDateTime departureTime;
     private ZonedDateTime arrivalTime;
@@ -37,7 +36,7 @@ public class Flight implements HasId {
     private AirCompany airCompany;
 
     public Flight(final ZonedDateTime departureTime, final ZonedDateTime arrivalTime, final Airport departureAirport, final Airport arrivalAirport, final Aircraft aircraft, final AirCompany airCompany) {
-        this.id = idGenerator.createId();
+        this.id = IdService.createId();
         this.departureTime = departureTime;
         this.arrivalTime = arrivalTime;
         this.departureAirport = departureAirport;
@@ -51,7 +50,7 @@ public class Flight implements HasId {
     }
 
     public Flight(final ZonedDateTime departureTime, final ZonedDateTime arrivalTime, final Airport departureAirport, final Airport arrivalAirport, final Aircraft aircraft, final int economySeat, final int firstSeat, final int businessSeat, final boolean isCanceled, final AirCompany airCompany) {
-        this.id = idGenerator.createId();
+        this.id = IdService.createId();
         this.departureTime = departureTime;
         this.arrivalTime = arrivalTime;
         this.departureAirport = departureAirport;
@@ -145,18 +144,18 @@ public class Flight implements HasId {
         tickets.add(ticket);
     }
 
-    public boolean addPassenger(final TicketClass ticketClass, final Passenger passenger) {
-        if (!canAddPassenger(ticketClass, passenger))
+    public boolean addPassenger(final TicketType ticketType, final Passenger passenger) {
+        if (!canAddPassenger(ticketType, passenger))
             return false;
-        final Ticket newTicket = new Ticket(passenger, ticketClass, this);
+        final Ticket newTicket = new Ticket(passenger, ticketType, this);
         passenger.addTicket(newTicket);
         this.addTicket(newTicket);
         return true;
     }
 
     //only if one passenger can have one seat
-    public boolean canAddPassenger(final TicketClass ticketClass, final Passenger passenger) {
-        if (getCountOfLeftTicketsByClass(ticketClass) <= 0)
+    public boolean canAddPassenger(final TicketType ticketType, final Passenger passenger) {
+        if (getCountOfLeftTicketsByClass(ticketType) <= 0)
             return false;
         if (tickets.stream().anyMatch(ticket ->
                 passenger.equals(ticket.getPassenger())
@@ -166,22 +165,49 @@ public class Flight implements HasId {
     }
 
     public String getSeatsInfo() {
-        final int leftEcoTickets = getCountOfLeftTicketsByClass(TicketClass.Economy);
-        final int leftFirstTickets = getCountOfLeftTicketsByClass(TicketClass.First);
-        final int leftBusinessTickets = getCountOfLeftTicketsByClass(TicketClass.Business);
+        final int leftEcoTickets = getCountOfLeftTicketsByClass(TicketType.Economy);
+        final int leftFirstTickets = getCountOfLeftTicketsByClass(TicketType.First);
+        final int leftBusinessTickets = getCountOfLeftTicketsByClass(TicketType.Business);
 
         final String format = "%-8s| %5s| %9s| %6s| %12s| %9s |\n";
         final String header = String.format(format, "Class", "Free", "Occupied", "Total", "Price to buy", "Profit");
         final String divider = "-----------------------------------------------------------\n";
-        final String ecoRow = String.format(format, "Economy", leftEcoTickets, (economySeat - leftEcoTickets), economySeat, Calculations.calculatePrice(TicketClass.Economy, this, airCompany.getFlightPrices()), calculateProfitByClass(TicketClass.Economy));
-        final String firstRow = String.format(format, "First", leftFirstTickets, (firstSeat - leftFirstTickets), firstSeat, Calculations.calculatePrice(TicketClass.First, this, airCompany.getFlightPrices()), calculateProfitByClass(TicketClass.First));
-        final String businessRow = String.format(format, "Business", leftBusinessTickets, (businessSeat - leftBusinessTickets), businessSeat, Calculations.calculatePrice(TicketClass.Business, this, airCompany.getFlightPrices()), calculateProfitByClass(TicketClass.Business));
+        final String ecoRow = String.format(format, "Economy", leftEcoTickets, (economySeat - leftEcoTickets), economySeat, calculatePrice(TicketType.Economy), calculateProfitByClass(TicketType.Economy));
+        final String firstRow = String.format(format, "First", leftFirstTickets, (firstSeat - leftFirstTickets), firstSeat, calculatePrice(TicketType.First), calculateProfitByClass(TicketType.First));
+        final String businessRow = String.format(format, "Business", leftBusinessTickets, (businessSeat - leftBusinessTickets), businessSeat, calculatePrice(TicketType.Business), calculateProfitByClass(TicketType.Business));
         final String totalRow = String.format(format, "Total", getCountOfLeftTickets(), (economySeat - leftEcoTickets + firstSeat - leftFirstTickets + businessSeat - leftBusinessTickets), (economySeat + firstSeat + businessSeat), "", calculateProfit());
 
         return header + divider + ecoRow + firstRow + businessRow + divider + totalRow;
     }
 
-
+    public double calculatePrice(final TicketType ticketType) {
+        double price = 0;
+        final double baseEconomyCost = airCompany.getFlightPrices().getBaseEconomyCost();
+        final double baseFirstCost = airCompany.getFlightPrices().getBaseFirstCost();
+        final double baseBusinessCost = airCompany.getFlightPrices().getBaseBusinessCost();
+        final double countOfCanceledTickets = getCountOfCanceled();
+        final double countOfSeats =getCountOfSeats();
+        final double allowCancelPercentage = airCompany.getFlightPrices().getAllowCancelPercentage();
+        final double countOfLeftTickets = getCountOfLeftTickets();
+        final double percentageMarkupForLastTicket = airCompany.getFlightPrices().getPercentageMarkupForLastTicket();
+        final double percentageDiscountIfAllCancel = airCompany.getFlightPrices().getPercentageDiscountIfAllCancel();
+        //base price by class
+        switch (ticketType) {
+            case Economy -> price += baseEconomyCost;
+            case First -> price += baseFirstCost;
+            case Business -> price += baseBusinessCost;
+            default -> throw new NoSuchElementException("No type of ticket in calculating price");
+        }
+        //the fewer tickets, the higher the price only if not many cancels
+        if ((double) countOfCanceledTickets / countOfSeats < allowCancelPercentage && countOfLeftTickets < countOfSeats) {
+            price *= ((1.00 - (double) countOfLeftTickets / countOfSeats) * percentageMarkupForLastTicket)+1;
+        }
+        //the more canceled tickets, the bigger the discount
+        if (countOfCanceledTickets > 0 && countOfCanceledTickets < countOfSeats) {
+            price /= (1.00 - (double) countOfCanceledTickets / countOfSeats) * percentageDiscountIfAllCancel;
+        }
+        return (int) price;
+    }
     public double calculateProfit() {
         double profit = 0;
         for (final Ticket ticket : tickets) {
@@ -190,10 +216,10 @@ public class Flight implements HasId {
         return (int) profit;
     }
 
-    public double calculateProfitByClass(final TicketClass ticketClass) {
+    public double calculateProfitByClass(final TicketType ticketType) {
         double profit = 0;
         for (final Ticket ticket : tickets) {
-            if (ticket.getTicketClass() == ticketClass)
+            if (ticket.getTicketClass() == ticketType)
                 profit += ticket.getFullPrice();
         }
         return (int) profit;
@@ -221,8 +247,8 @@ public class Flight implements HasId {
         return economySeat + firstSeat + businessSeat;
     }
 
-    public int getCountOfSeatsByClass(final TicketClass ticketClass) {
-        switch (ticketClass) {
+    public int getCountOfSeatsByClass(final TicketType ticketType) {
+        switch (ticketType) {
             case Economy -> {
                 return economySeat;
             }
@@ -247,15 +273,15 @@ public class Flight implements HasId {
         return this.getCountOfSeats() - count;
     }
 
-    public int getCountOfLeftTicketsByClass(final TicketClass ticketClass) {
+    public int getCountOfLeftTicketsByClass(final TicketType ticketType) {
         int count = 0;
         for (final Ticket ticket : tickets) {
             if (ticket.isCanceled())
                 continue;
-            if (ticket.getTicketClass() == ticketClass)
+            if (ticket.getTicketClass() == ticketType)
                 count++;
         }
-        return this.getCountOfSeatsByClass(ticketClass) - count;
+        return this.getCountOfSeatsByClass(ticketType) - count;
     }
 
     public int getCountOfOccupiedTickets() {
@@ -270,7 +296,7 @@ public class Flight implements HasId {
     public double getDistance() {
         if (arrivalAirport == null || departureAirport == null)
             return 0;
-        return Calculations.calculateDistanceByCoordinates(arrivalAirport.getLocation().getLatitude(),
+        return CalculateDistance.calculateDistanceByCoordinates(arrivalAirport.getLocation().getLatitude(),
                 arrivalAirport.getLocation().getLongitude(),
                 departureAirport.getLocation().getLatitude(),
                 departureAirport.getLocation().getLongitude());
