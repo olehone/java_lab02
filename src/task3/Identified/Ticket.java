@@ -1,6 +1,5 @@
 package task3.Identified;
 
-import task3.IdGenerator;
 import task3.Data.TicketType;
 import task3.IdService;
 

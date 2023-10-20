@@ -1,6 +1,5 @@
 package task3.Identified;
 
-import task3.IdGenerator;
 import task3.IdService;
 import task3.Rules.LuggageRules;
 
