@@ -1,7 +1,7 @@
 package task2;
 
 //Сфера/куля
-public class Sphere {
+public class Sphere implements VolumetricFigure{
     private final double radius;
 
     public Sphere(final double radius) {

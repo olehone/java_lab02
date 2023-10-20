@@ -1,7 +1,7 @@
 package task2;
 
 //Прямокутник
-public class Rectangle {
+public class Rectangle implements FlatFigure {
     private final double length;
     private final double width;
     public Rectangle(final double length, final double width) {

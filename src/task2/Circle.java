@@ -1,7 +1,7 @@
 package task2;
 
 //Коло
-public class Circle {
+public class Circle implements FlatFigure{
     private final double radius;
 
     public Circle(final double radius) {

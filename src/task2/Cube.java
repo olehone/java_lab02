@@ -1,6 +1,6 @@
 package task2;
 //Куб
-public class Cube {
+public class Cube implements VolumetricFigure {
     private final double sideLength;
     public Cube(final double sideLength) {
         if (sideLength <= 0)

@@ -1,7 +1,7 @@
 package task2;
 
 //Трикутник
-public class Triangle {
+public class Triangle implements FlatFigure{
     private final double firstSide;
     private final double secondSide;
     private final double thirdSide;

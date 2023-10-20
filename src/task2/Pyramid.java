@@ -1,7 +1,7 @@
 package task2;
 
 //Піраміда
-public class Pyramid {
+public class Pyramid implements VolumetricFigure{
     private final Triangle base;
     private final double height;
 
@@ -18,7 +18,7 @@ public class Pyramid {
         return base.getArea() + getApothem() * base.getPerimeter() / 2;
     }
     //apothem - the height of the side face
-    public double getApothem(){
+    private double getApothem(){
         return Math.sqrt(Math.pow(base.getRadiusOfInscribedCircle(), 2) +Math.pow(height, 2));
     }
 }
