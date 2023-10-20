@@ -8,7 +8,7 @@ import java.time.ZonedDateTime;
 
 public class Main {
     public static void main(final String[] args) {
-  /*      //Task 1
+        //Task 1
         final Stack<Integer> testIntStack = new Stack<>();
         final Stack<String> testStrStack = new Stack<>();
         //=================================================
@@ -43,7 +43,6 @@ public class Main {
         System.out.println(sphere.getArea() + " is sphere area");
         System.out.println(cube.getVolume() + " is cube volume");
         System.out.println(pyramid.getVolume() + " is pyramid volume");
-*/
 
         //Створіть систему управління польотами авіакомпанії. Пропоновані
         //класи для ієрархії: літак, аеропорт, пасажир, рейс, розклад польотів,
@@ -81,8 +80,8 @@ public class Main {
         service.addAirport("KYIV", "Ukraine", "Kyiv", 50.4501, 30.5234, ZoneId.of("+2"));
         service.addAirport("NY","United States", "New York", 40.7128, -74.0060, ZoneId.of("America/New_York"));
 
-        service.addAirCompany("Lufthansa", 950.0, 1150.0, 1400.0, 0.08, 0.2, 0.5, 0.01, 0.001, 0.5, 0.75, 0.90, 0.95, 1.08, 25.0, 120.0, 90.0, 14.5, 35.0, 150.0);
-        service.addAirCompany("Delta Air Lines", 1200.0, 1700.0, 2000.0, 0.12, 0.2, 0.6, 0.005, 0.1, 0.70, 0.90, 0.95, 1, 1.12, 15.0, 80.0, 150.0, 26.5, 25.0, 100.0);
+        service.addAirlines("Lufthansa", 950.0, 1150.0, 1400.0, 0.08, 0.2, 0.5, 0.01, 0.001, 0.5, 0.75, 0.90, 0.95, 1.08, 25.0, 120.0, 90.0, 14.5, 35.0, 150.0);
+        service.addAirlines("Delta Air Lines", 1200.0, 1700.0, 2000.0, 0.12, 0.2, 0.6, 0.005, 0.1, 0.70, 0.90, 0.95, 1, 1.12, 15.0, 80.0, 150.0, 26.5, 25.0, 100.0);
 
         service.addAircraft("Boeing", "747", 110, 30, 16);
         service.addAircraft("Airbus", "A340", 30, 50, 30);

@@ -33,9 +33,9 @@ public class Flight{
     private int businessSeat;
     private boolean isCanceled;
     final private List<Ticket> tickets;
-    private AirCompany airCompany;
+    private Airline airline;
 
-    public Flight(final ZonedDateTime departureTime, final ZonedDateTime arrivalTime, final Airport departureAirport, final Airport arrivalAirport, final Aircraft aircraft, final AirCompany airCompany) {
+    public Flight(final ZonedDateTime departureTime, final ZonedDateTime arrivalTime, final Airport departureAirport, final Airport arrivalAirport, final Aircraft aircraft, final Airline airline) {
         this.id = IdService.createId();
         this.departureTime = departureTime;
         this.arrivalTime = arrivalTime;
@@ -45,11 +45,11 @@ public class Flight{
         this.economySeat = aircraft.getEconomySeat();
         this.firstSeat = aircraft.getFirstSeat();
         this.businessSeat = aircraft.getBusinessSeat();
-        this.airCompany = airCompany;
+        this.airline = airline;
         this.tickets = new LinkedList<>();
     }
 
-    public Flight(final ZonedDateTime departureTime, final ZonedDateTime arrivalTime, final Airport departureAirport, final Airport arrivalAirport, final Aircraft aircraft, final int economySeat, final int firstSeat, final int businessSeat, final boolean isCanceled, final AirCompany airCompany) {
+    public Flight(final ZonedDateTime departureTime, final ZonedDateTime arrivalTime, final Airport departureAirport, final Airport arrivalAirport, final Aircraft aircraft, final int economySeat, final int firstSeat, final int businessSeat, final boolean isCanceled, final Airline airline) {
         this.id = IdService.createId();
         this.departureTime = departureTime;
         this.arrivalTime = arrivalTime;
@@ -60,7 +60,7 @@ public class Flight{
         this.firstSeat = firstSeat;
         this.businessSeat = businessSeat;
         this.isCanceled = isCanceled;
-        this.airCompany = airCompany;
+        this.airline = airline;
         this.tickets = new LinkedList<>();
     }
 
@@ -182,15 +182,15 @@ public class Flight{
 
     public double calculatePrice(final TicketType ticketType) {
         double price = 0;
-        final double baseEconomyCost = airCompany.getFlightPrices().getBaseEconomyCost();
-        final double baseFirstCost = airCompany.getFlightPrices().getBaseFirstCost();
-        final double baseBusinessCost = airCompany.getFlightPrices().getBaseBusinessCost();
+        final double baseEconomyCost = airline.getFlightPrices().getBaseEconomyCost();
+        final double baseFirstCost = airline.getFlightPrices().getBaseFirstCost();
+        final double baseBusinessCost = airline.getFlightPrices().getBaseBusinessCost();
         final double countOfCanceledTickets = getCountOfCanceled();
         final double countOfSeats =getCountOfSeats();
-        final double allowCancelPercentage = airCompany.getFlightPrices().getAllowCancelPercentage();
+        final double allowCancelPercentage = airline.getFlightPrices().getAllowCancelPercentage();
         final double countOfLeftTickets = getCountOfLeftTickets();
-        final double percentageMarkupForLastTicket = airCompany.getFlightPrices().getPercentageMarkupForLastTicket();
-        final double percentageDiscountIfAllCancel = airCompany.getFlightPrices().getPercentageDiscountIfAllCancel();
+        final double percentageMarkupForLastTicket = airline.getFlightPrices().getPercentageMarkupForLastTicket();
+        final double percentageDiscountIfAllCancel = airline.getFlightPrices().getPercentageDiscountIfAllCancel();
         //base price by class
         switch (ticketType) {
             case Economy -> price += baseEconomyCost;
@@ -226,7 +226,7 @@ public class Flight{
     }
 
     public void cancel() {
-        final double returnPercentageIfFlightCanceled = airCompany.getFlightPrices().getReturnPercentageIfFlightCanceled();
+        final double returnPercentageIfFlightCanceled = airline.getFlightPrices().getReturnPercentageIfFlightCanceled();
         for (final Ticket ticket : tickets) {
             if (ticket != null)
                 ticket.flightCancel(returnPercentageIfFlightCanceled);
@@ -302,12 +302,12 @@ public class Flight{
                 departureAirport.getLocation().getLongitude());
     }
 
-    public AirCompany getAirCompany() {
-        return airCompany;
+    public Airline getAirlines() {
+        return airline;
     }
 
-    public void setAirCompany(final AirCompany airCompany) {
-        this.airCompany = airCompany;
+    public void setAirlines(final Airline airline) {
+        this.airline = airline;
     }
 
     public String toShortString() {
@@ -320,7 +320,7 @@ public class Flight{
                 " " + departureAirport.toShortString() +
                 "-" + arrivalAirport.toShortString() +
                 " " + arrivalTime.format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")) +
-                " " + airCompany.toShortString() +
+                " " + airline.toShortString() +
                 " " + aircraft.toShortString();
 
         return str;
@@ -333,7 +333,7 @@ public class Flight{
             str += "CANCELED ";
         }
         str += "flight id: " + id +
-                "\n Air company " + airCompany.toString() +
+                "\n Airline " + airline.toString() +
                 "\n Aircraft " + aircraft.toString() +
                 "\n\n DEPARTURE  " +
                 "\n Airport: " + departureAirport.toString() +

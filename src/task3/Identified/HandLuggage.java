@@ -50,7 +50,7 @@ public class HandLuggage{
         this.additionalPrice = calculatePrice(weight, length, width, height, luggageRules);
     }
     public HandLuggage(final double weight, final int length, final int width, final int height, final Ticket ticket) {
-        this(weight, length, width, height, ticket, ticket.getFlight().getAirCompany().getLuggageRules());
+        this(weight, length, width, height, ticket, ticket.getFlight().getAirlines().getLuggageRules());
     }
     public double cancel() {
         final double returnAdditionalPrice = additionalPrice;
@@ -61,11 +61,11 @@ public class HandLuggage{
         this.additionalPrice = 0;
         return returnAdditionalPrice;
     }
-    public boolean changeSize(final double weight, final int length, final int width, final int height, final boolean canPayMore, final AirCompany airCompany) {
-        if (airCompany == null) {
-            throw new NullPointerException("Can`t change price! Air company is null");
+    public boolean changeSize(final double weight, final int length, final int width, final int height, final boolean canPayMore, final Airline airline) {
+        if (airline == null) {
+            throw new NullPointerException("Can`t change price! line is null");
         }
-        return changeSize(weight, length, width, height, canPayMore, airCompany.getLuggageRules());
+        return changeSize(weight, length, width, height, canPayMore, airline.getLuggageRules());
     }
     public boolean changeSize(final double weight, final int length, final int width, final int height, final boolean canPayMore, final LuggageRules luggageRules) {
         if (luggageRules == null) {
@@ -99,13 +99,13 @@ public class HandLuggage{
         return true;
     }
 
-    public Double calculatePrice(final double weight, final int length, final int width, final int height, final AirCompany airCompany) {
+    public Double calculatePrice(final double weight, final int length, final int width, final int height, final Airline airline) {
 
-        if (airCompany == null) {
-            throw new NullPointerException("Can`t calculate price! Air company is null");
+        if (airline == null) {
+            throw new NullPointerException("Can`t calculate price! line is null");
         }
 
-        return calculatePrice(weight, length, width, height, airCompany.getLuggageRules());
+        return calculatePrice(weight, length, width, height, airline.getLuggageRules());
     }
     public Double calculatePrice(final double weight, final int length, final int width, final int height, final LuggageRules luggageRules) {
 
@@ -148,11 +148,11 @@ public class HandLuggage{
         return true;
     }
 
-    public boolean isUnpaid(final double weight, final int length, final int width, final int height, final AirCompany airCompany) {
-        if (airCompany == null) {
-            throw new NullPointerException("Can`t calculate price! Air company is null");
+    public boolean isUnpaid(final double weight, final int length, final int width, final int height, final Airline airline) {
+        if (airline == null) {
+            throw new NullPointerException("Can`t calculate price! line is null");
         }
-        return isUnpaid(weight, length, width, height, airCompany.getLuggageRules());
+        return isUnpaid(weight, length, width, height, airline.getLuggageRules());
     }
     public boolean isUnpaid(final double weight, final int length, final int width, final int height, final LuggageRules luggageRules) {
         if (luggageRules == null) {
@@ -172,10 +172,10 @@ public class HandLuggage{
         return true;
     }
 
-    public boolean isAllowed(final double weight, final int length, final int width, final int height, final AirCompany airCompany) {
-        if(airCompany == null)
-            throw new NullPointerException("Can`t calculate price! Air company is null");
-        return isAllowed(weight, length, width, height, airCompany.getLuggageRules());
+    public boolean isAllowed(final double weight, final int length, final int width, final int height, final Airline airline) {
+        if(airline == null)
+            throw new NullPointerException("Can`t calculate price! line is null");
+        return isAllowed(weight, length, width, height, airline.getLuggageRules());
     }
     public boolean isAllowed(final double weight, final int length, final int width, final int height, final LuggageRules luggageRules) {
         if (luggageRules == null) {

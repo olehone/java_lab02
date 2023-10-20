@@ -47,10 +47,10 @@ public class Ticket{
     }
 
     public double cancel() {
-        return cancel(flight.getAirCompany().getFlightPrices().getReturnPercentageInLess30Day(),
-                flight.getAirCompany().getFlightPrices().getReturnPercentageInLess10Day(),
-                flight.getAirCompany().getFlightPrices().getReturnPercentageInLess3Day(),
-                flight.getAirCompany().getFlightPrices().getBaseReturnPercentage());
+        return cancel(flight.getAirlines().getFlightPrices().getReturnPercentageInLess30Day(),
+                flight.getAirlines().getFlightPrices().getReturnPercentageInLess10Day(),
+                flight.getAirlines().getFlightPrices().getReturnPercentageInLess3Day(),
+                flight.getAirlines().getFlightPrices().getBaseReturnPercentage());
     }
 
     //outputs how much to return to passenger
@@ -62,7 +62,7 @@ public class Ticket{
         if (departureDateTime.isAfter(ZonedDateTime.now())) {
             return 0;
         }
-        handLuggage.changeSize(0, 0, 0, 0, false, flight.getAirCompany());
+        handLuggage.changeSize(0, 0, 0, 0, false, flight.getAirlines());
         final long hoursTo = ChronoUnit.DAYS.between(ZonedDateTime.now(), departureDateTime);
         isCanceled = true;
         if (hoursTo > 30) {

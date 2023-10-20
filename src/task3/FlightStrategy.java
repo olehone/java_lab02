@@ -23,8 +23,8 @@ public interface FlightStrategy {
     boolean changeAircraft(Long aircraftId, String manufacturer, String model, Integer economySeat, Integer firstSeat, Integer businessSeat);
     boolean deleteAircraft(Long aircraftId);
 
-    Long addFlight(ZonedDateTime departureTime, ZonedDateTime arrivalTime, Long departureAirportId, Long arrivalAirportId, Long aircraftId, Long airCompanyId);
-    boolean changeFlight(Long flightId, ZonedDateTime departureTime, ZonedDateTime arrivalTime, Long departureAirportId, Long arrivalAirportId, Long aircraftId, Long airCompanyId);
+    Long addFlight(ZonedDateTime departureTime, ZonedDateTime arrivalTime, Long departureAirportId, Long arrivalAirportId, Long aircraftId, Long AirlinesId);
+    boolean changeFlight(Long flightId, ZonedDateTime departureTime, ZonedDateTime arrivalTime, Long departureAirportId, Long arrivalAirportId, Long aircraftId, Long AirlinesId);
     boolean deleteFlight(Long flightId);
 
     Long addPassenger(String firstName, String lastName, boolean isBonusEnable);

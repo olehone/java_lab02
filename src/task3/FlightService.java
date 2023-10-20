@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class FlightService implements FlightStrategy{
     final private List<Passenger> passengers;
     final private List<Aircraft> aircrafts;
-    final private List<AirCompany> airCompanies;
+    final private List<Airline> airlines;
     final private List<Airport> airports;
     final private List<Flight> flights;
     final private DefaultValuesService defaultValuesService;
@@ -24,7 +24,7 @@ public class FlightService implements FlightStrategy{
         this.passengers = new LinkedList<>();
         this.aircrafts = new LinkedList<>();
         this.airports = new LinkedList<>();
-        this.airCompanies = new LinkedList<>();
+        this.airlines = new LinkedList<>();
         this.flights = new LinkedList<>();
         this.defaultValuesService = new DefaultValuesService();
     }
@@ -44,20 +44,20 @@ public class FlightService implements FlightStrategy{
         return newTicket.getId();
     }
 
-    public Long addAirCompany(final String name, final double baseEconomyCost, final double baseFirstCost, final double baseBusinessCost, final double allowCancelPercentage, final double percentageMarkupForLastTicket, final double percentageDiscountIfAllCancel, final double pricePerKm, final double coefficientOfFlownKilometers, final double returnPercentageInLess3Day, final double returnPercentageInLess10Day, final double returnPercentageInLess30Day, final double baseReturnPercentage, final double returnPercentageIfFlightCanceled, final double maxUnpaidWeightInKg, final double maxUnpaidSideLengthInCm, final double priceForExtraWeightByKg, final double priceForExtraLengthByCm, final double maxWeightInKg, final double maxSideLengthInCm) {
+    public Long addAirlines(final String name, final double baseEconomyCost, final double baseFirstCost, final double baseBusinessCost, final double allowCancelPercentage, final double percentageMarkupForLastTicket, final double percentageDiscountIfAllCancel, final double pricePerKm, final double coefficientOfFlownKilometers, final double returnPercentageInLess3Day, final double returnPercentageInLess10Day, final double returnPercentageInLess30Day, final double baseReturnPercentage, final double returnPercentageIfFlightCanceled, final double maxUnpaidWeightInKg, final double maxUnpaidSideLengthInCm, final double priceForExtraWeightByKg, final double priceForExtraLengthByCm, final double maxWeightInKg, final double maxSideLengthInCm) {
         final FlightRules newFlightRules = new FlightRules(baseEconomyCost, baseFirstCost, baseBusinessCost, allowCancelPercentage, percentageMarkupForLastTicket, percentageDiscountIfAllCancel, pricePerKm, coefficientOfFlownKilometers, returnPercentageInLess3Day, returnPercentageInLess10Day, returnPercentageInLess30Day, baseReturnPercentage, returnPercentageIfFlightCanceled);
         final LuggageRules newLuggageRules = new LuggageRules(maxUnpaidWeightInKg, maxUnpaidSideLengthInCm, priceForExtraWeightByKg, priceForExtraLengthByCm, maxWeightInKg, maxSideLengthInCm);
-        return addAirCompany(name, newFlightRules, newLuggageRules);
+        return addAirlines(name, newFlightRules, newLuggageRules);
     }
 
-    public Long addAirCompany(final String name, final FlightRules flightRules, final LuggageRules luggageRules) {
+    public Long addAirlines(final String name, final FlightRules flightRules, final LuggageRules luggageRules) {
         if (flightRules == null)
             return null;
         if (luggageRules == null)
             return null;
-        final AirCompany newAirCompany = new AirCompany(name, flightRules, luggageRules);
-        airCompanies.add(newAirCompany);
-        return newAirCompany.getId();
+        final Airline newAirline = new Airline(name, flightRules, luggageRules);
+        airlines.add(newAirline);
+        return newAirline.getId();
     }
 
 
@@ -93,18 +93,18 @@ public class FlightService implements FlightStrategy{
         return newAirport.getId();
     }
 
-    public Long addFlight(final ZonedDateTime departureTime, final ZonedDateTime arrivalTime, final Long departureAirportId, final Long arrivalAirportId, final Long aircraftId, final Long airCompanyId) {
+    public Long addFlight(final ZonedDateTime departureTime, final ZonedDateTime arrivalTime, final Long departureAirportId, final Long arrivalAirportId, final Long aircraftId, final Long AirlinesId) {
         final Airport departureAirport = getAirportById(departureAirportId);
         final Airport arrivalAirport = getAirportById(arrivalAirportId);
-        final AirCompany airCompany = getAirCompanyById(airCompanyId);
+        final Airline airline = getAirlinesById(AirlinesId);
         final Aircraft aircraft = getAircraftById(aircraftId);
-        return addFlight(departureTime, arrivalTime, departureAirport, arrivalAirport, aircraft, airCompany);
+        return addFlight(departureTime, arrivalTime, departureAirport, arrivalAirport, aircraft, airline);
     }
 
-    private Long addFlight(final ZonedDateTime departureTime, final ZonedDateTime arrivalTime, final Airport departureAirport, final Airport arrivalAirport, final Aircraft aircraft, final AirCompany airCompany) {
-        if (departureAirport == null || arrivalAirport == null || airCompany == null || aircraft == null)
+    private Long addFlight(final ZonedDateTime departureTime, final ZonedDateTime arrivalTime, final Airport departureAirport, final Airport arrivalAirport, final Aircraft aircraft, final Airline airline) {
+        if (departureAirport == null || arrivalAirport == null || airline == null || aircraft == null)
             return null;
-        final Flight newFlight = new Flight(departureTime, arrivalTime, departureAirport, arrivalAirport, aircraft, airCompany);
+        final Flight newFlight = new Flight(departureTime, arrivalTime, departureAirport, arrivalAirport, aircraft, airline);
         departureAirport.addFlight(newFlight);
         arrivalAirport.addFlight(newFlight);
         flights.add(newFlight);
@@ -139,21 +139,21 @@ public class FlightService implements FlightStrategy{
         );
     }
 
-    public boolean changeFlight(final Long flightId, final ZonedDateTime departureTime, final ZonedDateTime arrivalTime, final Long departureAirportId, final Long arrivalAirportId, final Long aircraftId, final Long airCompanyId) {
+    public boolean changeFlight(final Long flightId, final ZonedDateTime departureTime, final ZonedDateTime arrivalTime, final Long departureAirportId, final Long arrivalAirportId, final Long aircraftId, final Long AirlinesId) {
         return changeFlight(getFlightById(flightId), departureTime, arrivalTime,
                 getAirportById(departureAirportId), getAirportById(arrivalAirportId),
-                getAircraftById(aircraftId), getAirCompanyById(airCompanyId));
+                getAircraftById(aircraftId), getAirlinesById(AirlinesId));
     }
 
-    private boolean changeFlight(final Flight flight, final ZonedDateTime departureTime, final ZonedDateTime arrivalTime, final Airport departureAirport, final Airport arrivalAirport, final Aircraft aircraft, final AirCompany airCompany) {
+    private boolean changeFlight(final Flight flight, final ZonedDateTime departureTime, final ZonedDateTime arrivalTime, final Airport departureAirport, final Airport arrivalAirport, final Aircraft aircraft, final Airline airline) {
         if (flight == null)
             return false;
         if (departureAirport != null)
             flight.setDepartureAirport(departureAirport);
         if (arrivalAirport != null)
             flight.setArrivalAirport(arrivalAirport);
-        if (airCompany != null)
-            flight.setAirCompany(airCompany);
+        if (airline != null)
+            flight.setAirlines(airline);
         if (aircraft != null)
             flight.setAircraft(aircraft);
         if (departureTime != null)
@@ -183,25 +183,25 @@ public class FlightService implements FlightStrategy{
         return true;
     }
 
-    public boolean changeAirCompany(final Long airCompanyId, final String name, final double baseEconomyCost, final double baseFirstCost, final double baseBusinessCost, final double allowCancelPercentage, final double percentageMarkupForLastTicket, final double percentageDiscountIfAllCancel, final double pricePerKm, final double coefficientOfFlownKilometers, final double returnPercentageInLess3Day, final double returnPercentageInLess10Day, final double returnPercentageInLess30Day, final double baseReturnPercentage, final double returnPercentageIfFlightCanceled, final double maxUnpaidWeightInKg, final double maxUnpaidSideLengthInCm, final double priceForExtraWeightByKg, final double priceForExtraLengthByCm, final double maxWeightInKg, final double maxSideLengthInCm) {
+    public boolean changeAirlines(final Long AirlinesId, final String name, final double baseEconomyCost, final double baseFirstCost, final double baseBusinessCost, final double allowCancelPercentage, final double percentageMarkupForLastTicket, final double percentageDiscountIfAllCancel, final double pricePerKm, final double coefficientOfFlownKilometers, final double returnPercentageInLess3Day, final double returnPercentageInLess10Day, final double returnPercentageInLess30Day, final double baseReturnPercentage, final double returnPercentageIfFlightCanceled, final double maxUnpaidWeightInKg, final double maxUnpaidSideLengthInCm, final double priceForExtraWeightByKg, final double priceForExtraLengthByCm, final double maxWeightInKg, final double maxSideLengthInCm) {
         final FlightRules newFlightRules = new FlightRules(baseEconomyCost, baseFirstCost, baseBusinessCost, allowCancelPercentage, percentageMarkupForLastTicket, percentageDiscountIfAllCancel, pricePerKm, coefficientOfFlownKilometers, returnPercentageInLess3Day, returnPercentageInLess10Day, returnPercentageInLess30Day, baseReturnPercentage, returnPercentageIfFlightCanceled);
         final LuggageRules newLuggageRules = new LuggageRules(maxUnpaidWeightInKg, maxUnpaidSideLengthInCm, priceForExtraWeightByKg, priceForExtraLengthByCm, maxWeightInKg, maxSideLengthInCm);
-        return changeAirCompany(airCompanyId, name, newFlightRules, newLuggageRules);
+        return changeAirlines(AirlinesId, name, newFlightRules, newLuggageRules);
     }
 
-    public boolean changeAirCompany(final Long airCompanyId, final String name, final FlightRules flightRules, final LuggageRules luggageRules) {
-        return changeAirCompany(getAirCompanyById(airCompanyId), name, flightRules, luggageRules);
+    public boolean changeAirlines(final Long AirlinesId, final String name, final FlightRules flightRules, final LuggageRules luggageRules) {
+        return changeAirlines(getAirlinesById(AirlinesId), name, flightRules, luggageRules);
     }
 
-    private boolean changeAirCompany(final AirCompany airCompany, final String name, final FlightRules flightRules, final LuggageRules luggageRules) {
-        if (airCompany == null)
+    private boolean changeAirlines(final Airline airline, final String name, final FlightRules flightRules, final LuggageRules luggageRules) {
+        if (airline == null)
             return false;
         if (flightRules != null)
-            airCompany.setFlightPrices(flightRules);
+            airline.setFlightPrices(flightRules);
         if (luggageRules != null)
-            airCompany.setLuggageRules(luggageRules);
+            airline.setLuggageRules(luggageRules);
         if (name != null)
-            airCompany.setName(name);
+            airline.setName(name);
         return true;
     }
 
@@ -231,33 +231,33 @@ public class FlightService implements FlightStrategy{
 
     }
 
-    private double getProfitByCompany(final AirCompany airCompany) {
-        if (airCompany == null)
+    private double getProfitByAirlines(final Airline airline) {
+        if (airline == null)
             return 0;
         double profit = 0;
-        final List<Flight> companyFlights = flights.stream().filter(flight -> flight.getAirCompany() == airCompany).toList();
-        for (final Flight flight : companyFlights) {
+        final List<Flight> airlinesFlights = flights.stream().filter(flight -> flight.getAirlines() == airline).toList();
+        for (final Flight flight : airlinesFlights) {
             profit += flight.calculateProfit();
         }
         return (int) profit;
     }
 
-    public double getProfitByCompanyId(final Long airCompanyId) {
-        final AirCompany airCompany = getAirCompanyById(airCompanyId);
-        return getProfitByCompany(airCompany);
+    public double getProfitByAirlinesId(final Long AirlinesId) {
+        final Airline airline = getAirlinesById(AirlinesId);
+        return getProfitByAirlines(airline);
     }
 
-    public double getProfitByTimeAndCompanyId(final Long airCompanyId, final ZonedDateTime startTime, final ZonedDateTime finalTime) {
-        final AirCompany airCompany = getAirCompanyById(airCompanyId);
-        return getProfitByTimeAndCompany(airCompany, startTime, finalTime);
+    public double getProfitByTimeAndAirlinesId(final Long AirlinesId, final ZonedDateTime startTime, final ZonedDateTime finalTime) {
+        final Airline airline = getAirlinesById(AirlinesId);
+        return getProfitByTimeAndAirlines(airline, startTime, finalTime);
     }
 
-    private double getProfitByTimeAndCompany(final AirCompany airCompany, final ZonedDateTime startTime, final ZonedDateTime finalTime) {
+    private double getProfitByTimeAndAirlines(final Airline airline, final ZonedDateTime startTime, final ZonedDateTime finalTime) {
         double profit = 0;
-        List<Flight> companyFlights = flights.stream().filter(flight -> flight.getAirCompany() == airCompany).toList();
-        companyFlights = companyFlights.stream().filter(flight -> startTime.isBefore(flight.getDepartureTime())).toList();
-        companyFlights = companyFlights.stream().filter(flight -> finalTime.isAfter(flight.getDepartureTime())).toList();
-        for (final Flight flight : companyFlights) {
+        List<Flight> airlinesFlights = flights.stream().filter(flight -> flight.getAirlines() == airline).toList();
+        airlinesFlights = airlinesFlights.stream().filter(flight -> startTime.isBefore(flight.getDepartureTime())).toList();
+        airlinesFlights = airlinesFlights.stream().filter(flight -> finalTime.isAfter(flight.getDepartureTime())).toList();
+        for (final Flight flight : airlinesFlights) {
             profit += flight.calculateProfit();
         }
         return (int) profit;
@@ -265,9 +265,9 @@ public class FlightService implements FlightStrategy{
 
     public double getProfitByTime(final ZonedDateTime startTime, final ZonedDateTime finalTime) {
         double profit = 0;
-        List<Flight> companyFlights = flights.stream().filter(flight -> startTime.isBefore(flight.getDepartureTime())).toList();
-        companyFlights = companyFlights.stream().filter(flight -> finalTime.isAfter(flight.getDepartureTime())).toList();
-        for (final Flight flight : companyFlights) {
+        List<Flight> airlinesFlights = flights.stream().filter(flight -> startTime.isBefore(flight.getDepartureTime())).toList();
+        airlinesFlights = airlinesFlights.stream().filter(flight -> finalTime.isAfter(flight.getDepartureTime())).toList();
+        for (final Flight flight : airlinesFlights) {
             profit += flight.calculateProfit();
         }
         return (int) profit;
@@ -410,9 +410,9 @@ public class FlightService implements FlightStrategy{
                 .orElse(null);
     }
 
-    public AirCompany getAirCompanyById(final Long airCompanyId) {
-        return airCompanies.stream()
-                .filter(company -> company.getId().equals(airCompanyId))
+    public Airline getAirlinesById(final Long AirlinesId) {
+        return airlines.stream()
+                .filter(line -> line.getId().equals(AirlinesId))
                 .findFirst()
                 .orElse(null);
     }
@@ -493,13 +493,13 @@ public class FlightService implements FlightStrategy{
         return airports.stream().map(Airport::withScheduleToString).collect(Collectors.joining("\n"));
     }
 
-    public String airCompaniesToString() {
-        return airCompanies.stream()
-                .map(airCompany -> airCompany.toString() +
+    public String airlinesToString() {
+        return airlines.stream()
+                .map(airline -> airline.toString() +
                         "\n Profit" +
-                        "\n Last year: " + getProfitByTimeAndCompany(airCompany, ZonedDateTime.now().minusMonths(12), ZonedDateTime.now()) +
-                        "\n Last quarter: " + getProfitByTimeAndCompany(airCompany, ZonedDateTime.now().minusMonths(3), ZonedDateTime.now()) +
-                        "\n Total: " + getProfitByCompany(airCompany) +
+                        "\n Last year: " + getProfitByTimeAndAirlines(airline, ZonedDateTime.now().minusMonths(12), ZonedDateTime.now()) +
+                        "\n Last quarter: " + getProfitByTimeAndAirlines(airline, ZonedDateTime.now().minusMonths(3), ZonedDateTime.now()) +
+                        "\n Total: " + getProfitByAirlines(airline) +
                         "\n")
                 .collect(Collectors.joining("\n"));
     }
@@ -522,9 +522,9 @@ public class FlightService implements FlightStrategy{
                 aircraftsToString() +
                 "\n********************\n" +
 
-                "Air Companies" +
+                "Airlines" +
                 "\n====================\n" +
-                airCompaniesToString() +
+                airlinesToString() +
                 "\n********************\n" +
 
                 "Flights" +

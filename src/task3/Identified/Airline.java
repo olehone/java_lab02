@@ -4,13 +4,13 @@ import task3.IdService;
 import task3.Rules.FlightRules;
 import task3.Rules.LuggageRules;
 
-public class AirCompany{
+public class Airline {
     private final Long id;
     private String name;
     private FlightRules flightRules;
     private LuggageRules luggageRules;
 
-    public AirCompany(final String name, final FlightRules flightRules, final LuggageRules luggageRules) {
+    public Airline(final String name, final FlightRules flightRules, final LuggageRules luggageRules) {
         this.id = IdService.createId();
         this.name = name;
         this.flightRules = flightRules;
