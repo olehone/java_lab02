@@ -1,0 +1,39 @@
+{
+	"nodes":[
+		{"id":"a3dd4dff533f97b0","type":"text","text":"*Пасажир*\n---\nІм'я\nПрізвище\nНабрані кілометри?\nЧи нараховувати кілометри?\n","x":520,"y":-1425,"width":250,"height":175,"color":"2"},
+		{"id":"3320056dd24ec3cb","type":"text","text":"*Ручний вантаж*\n---\nВисота\nШирина\nДовжина\nВага\nту стрінг","x":520,"y":-1607,"width":250,"height":180,"color":"6"},
+		{"id":"b4d3b23d07055274","type":"text","text":"*Рейс*\n---\nАйді\nГлобальний час відбуття\nГлобальний час прибуття\nМасив квитків\nТотальний заробіток\nЛітак\nАеропорт відбуття\nАеропорт прибуття\n","x":-135,"y":-1406,"width":250,"height":275,"color":"5"},
+		{"id":"afdc43c10c1fa3f2","type":"text","text":"*Квиток*\n---\nПасажир\nЦіна \nКлас квитка\nНомер місця\n","x":185,"y":-1595,"width":250,"height":156,"color":"5"},
+		{"id":"d04346549b68061e","type":"text","text":"*Літак*\n---\nВиробник\nМодель\nКількість економ класу\nКількість першого класу\nКількість бізнес класу\n","x":190,"y":-1412,"width":240,"height":181,"color":"2"},
+		{"id":"ac20db23a88f04df","type":"text","text":"Айропорт\n---\nАдреса\nРозклад польотів\nstat Отримати розклад","x":190,"y":-1212,"width":250,"height":160,"color":"2"},
+		{"id":"b1545c08e9291716","type":"text","text":"*Адреса* (локація)\n---\nКраїна\nМісто\nКоординати\nЧасовий пояс\nСтат метод вирахування відстані між координатами","x":520,"y":-1232,"width":250,"height":200,"color":"4"},
+		{"id":"15a44f3fb62a0f3c","type":"text","text":"*Розклад польотів*\n---\nАйропорт\nСписок рейсів","x":195,"y":-1009,"width":240,"height":120,"color":"4"},
+		{"id":"62f72a44a1123b93","type":"text","text":"*Ціни польотів*\n---\n\nКоефіцієнти\n","x":-260,"y":-1100,"width":220,"height":86,"color":"4"},
+		{"id":"9a1dd1da598d800b","type":"text","text":"*Правила вантажу*\n---\nМаксимальна вага/довжина\nЦіна за перевищення\nМаксимакльна безкоштовна вага/довжина\n","x":-507,"y":-1123,"width":220,"height":234,"color":"4"},
+		{"id":"da9b1ee35f32828b","type":"text","text":"*Айрокомпанія*\n---\nНазва\n","x":-397,"y":-1250,"width":220,"height":95,"color":"2"},
+		{"id":"5cfc9aee5e5a19f7","type":"text","text":"# Незалежний клас з ID","x":840,"y":-1458,"width":250,"height":90,"color":"5"},
+		{"id":"51f3754fd18e1dbc","type":"text","text":"# Загальний клас","x":840,"y":-1368,"width":250,"height":90,"color":"1"},
+		{"id":"03100ec8953c3e37","type":"text","text":"# Жорстко залежний клас","x":840,"y":-1285,"width":250,"height":100,"color":"4"},
+		{"id":"f7e3b614c8d64402","type":"text","text":"# Інтерфейс","x":965,"y":-1518,"width":250,"height":60,"color":"3"},
+		{"id":"beb499cb2ad52a7d","type":"text","text":"# Не залежний клас без ID(тре для класів з айді)","x":1090,"y":-1458,"width":250,"height":158,"color":"2"},
+		{"id":"36079d3fbbed0313","type":"text","text":"# Залежний клас з ID","x":1090,"y":-1292,"width":250,"height":107,"color":"6"},
+		{"id":"a9837dd2f58c622d","type":"text","text":"*Сервіс польотів*\n---\nМасив аеропортів\nМасив літаків\nМасив рейсів\nМасив пасажирів\nМасив айрокомпаній\nДефолтні значеня\n\nДодати/Видалити/Змінити\nТу стрінг","x":-482,"y":-1572,"width":305,"height":280,"color":"1"},
+		{"id":"4537a6ecd242ad1a","type":"text","text":"*Сервіс айді *\n---\nотримати айді","x":-243,"y":-981,"width":217,"height":92,"color":"1"},
+		{"id":"f41098b8cfe5becb","type":"text","text":"*Стратегія польотів*\n---\nСтворення, видалення, редагування літака\nСтворення, видалення, редагування рейсу\nСтворення, видалення, редагування пасажирів\nСтворення, видалення, редагування аеропорта\nВідображення розкладів польотів\nСтворення розкладу польотів\nПродаж, скасування квитків\nРозрахунок доходів за заданий період часу","x":-190,"y":-1870,"width":361,"height":263,"color":"3"}
+	],
+	"edges":[
+		{"id":"5e008dfc63160871","fromNode":"b4d3b23d07055274","fromSide":"right","toNode":"ac20db23a88f04df","toSide":"left"},
+		{"id":"dcaa67829317471c","fromNode":"b4d3b23d07055274","fromSide":"top","toNode":"afdc43c10c1fa3f2","toSide":"left","fromEnd":"arrow","color":"2","label":"n-1"},
+		{"id":"f9c93c74128c97f3","fromNode":"b4d3b23d07055274","fromSide":"right","toNode":"ac20db23a88f04df","toSide":"left","color":"2","label":"2"},
+		{"id":"4c1ee891fd717b51","fromNode":"afdc43c10c1fa3f2","fromSide":"right","toNode":"a3dd4dff533f97b0","toSide":"left","fromEnd":"arrow","color":"2"},
+		{"id":"e6805feb6de4130a","fromNode":"b4d3b23d07055274","fromSide":"right","toNode":"d04346549b68061e","toSide":"left","color":"2"},
+		{"id":"24037402764a31fc","fromNode":"afdc43c10c1fa3f2","fromSide":"right","toNode":"3320056dd24ec3cb","toSide":"left","color":"4"},
+		{"id":"608c9f6f807cdae4","fromNode":"ac20db23a88f04df","fromSide":"bottom","toNode":"15a44f3fb62a0f3c","toSide":"top","color":"2"},
+		{"id":"951ca576d4944c72","fromNode":"15a44f3fb62a0f3c","fromSide":"left","toNode":"b4d3b23d07055274","toSide":"bottom","color":"2","label":"n"},
+		{"id":"8338fb70a57fa633","fromNode":"b4d3b23d07055274","fromSide":"left","toNode":"da9b1ee35f32828b","toSide":"right","color":"2"},
+		{"id":"63f8f2efc07c357d","fromNode":"da9b1ee35f32828b","fromSide":"bottom","toNode":"62f72a44a1123b93","toSide":"top","color":"4"},
+		{"id":"2de0ee5ed7874b5b","fromNode":"da9b1ee35f32828b","fromSide":"bottom","toNode":"9a1dd1da598d800b","toSide":"top","color":"4"},
+		{"id":"ace368366646189d","fromNode":"ac20db23a88f04df","fromSide":"right","toNode":"b1545c08e9291716","toSide":"left","color":"4"},
+		{"id":"34780213fc1b0236","fromNode":"a9837dd2f58c622d","fromSide":"right","toNode":"f41098b8cfe5becb","toSide":"bottom","color":"3"}
+	]
+}
